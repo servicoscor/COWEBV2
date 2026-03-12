@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COR Rio - Telao Calor</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Segoe UI,Arial,sans-serif}
+body{
+  background:#06132a center/cover no-repeat;
+}
+</style>
+</head>
+<body>
+<script>
+const API_URL = 'https://aplicativo.cocr.com.br/calor_api';
+const LS_KEY = 'cor_rio_state';
+const BC = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('cor_rio_alert') : null;
+const HEAT_MIN = 1;
+const HEAT_MAX = 5;
+const HEAT_KEYS = new Set([
+  'heat','calor','heat_level','calor_level','nivel_calor',
+  'nivelcalor','current_heat','currentcalor','id_calor','idheat','level','nivel'
+]);
+
+let inFlight = false;
+let running = true;
+
+function heatImage(level){
+  return `Nivel%20calor/calor${level}.jpg`;
+}
+function normalizeHeat(value){
+  const parsed = Number.parseInt(value, 10);
+  if(!Number.isInteger(parsed)) return null;
+  return Math.min(HEAT_MAX, Math.max(HEAT_MIN, parsed));
+}
+function parseLevelValue(value){
+  if(typeof value === 'number' && Number.isFinite(value)) return Math.trunc(value);
+  if(typeof value !== 'string') return null;
+  const m = value.trim().match(/-?\d+/);
+  if(!m) return null;
+  return Number.parseInt(m[0], 10);
+}
+function extractLevel(payload, keys, seen = new WeakSet()){
+  if(typeof payload === 'number' || typeof payload === 'string') return parseLevelValue(payload);
+  if(!payload || typeof payload !== 'object') return null;
+  if(seen.has(payload)) return null;
+  seen.add(payload);
+  if(Array.isArray(payload)){
+    for(const item of payload){
+      const found = extractLevel(item, keys, seen);
+      if(found !== null) return found;
+    }
+    return null;
+  }
+  for(const [rawKey, value] of Object.entries(payload)){
+    const key = String(rawKey).toLowerCase();
+    if(keys.has(key)){
+      const found = parseLevelValue(value);
+      if(found !== null) return found;
+    }
+    if(value && typeof value === 'object'){
+      const nested = extractLevel(value, keys, seen);
+      if(nested !== null) return nested;
+    }
+  }
+  return null;
+}
+function renderHeat(level){
+  const normalized = normalizeHeat(level);
+  if(normalized === null) return;
+  document.body.style.backgroundImage = `url('${heatImage(normalized)}')`;
+}
+function applyStateObject(state){
+  if(!state || typeof state !== 'object') return;
+  if(!('heat' in state)) return;
+  renderHeat(state.heat);
+}
+async function fetchPayload(url){
+  const res = await fetch(url, { method:'GET', cache:'no-store' });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  if(!text) return null;
+  try{ return JSON.parse(text); }catch(e){ return text.trim(); }
+}
+async function pollLoop(){
+  if(!running) return;
+  if(inFlight){
+    setTimeout(pollLoop, 0);
+    return;
+  }
+  inFlight = true;
+  try{
+    const payload = await fetchPayload(API_URL);
+    const level = extractLevel(payload, HEAT_KEYS);
+    if(level !== null) renderHeat(level);
+  }catch(e){
+  }finally{
+    inFlight = false;
+    setTimeout(pollLoop, 0);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    const savedRaw = localStorage.getItem(LS_KEY);
+    if(savedRaw){
+      const saved = JSON.parse(savedRaw);
+      applyStateObject(saved);
+    }else{
+      renderHeat(1);
+    }
+  }catch(e){
+    renderHeat(1);
+  }
+
+  if(BC){
+    BC.addEventListener('message', (event)=>applyStateObject(event.data));
+  }
+  window.addEventListener('storage', (event)=>{
+    if(event.key !== LS_KEY || !event.newValue) return;
+    try{ applyStateObject(JSON.parse(event.newValue)); }catch(e){}
+  });
+
+  pollLoop();
+});
+</script>
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COR Rio - Telao Estagio</title>
+<style>
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:Segoe UI,Arial,sans-serif}
+body{
+  background:#03112a center/cover no-repeat;
+}
+</style>
+</head>
+<body>
+<script>
+const API_URL = 'https://aplicativo.cocr.com.br/estagio_api_app';
+const LS_KEY = 'cor_rio_state';
+const BC = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('cor_rio_alert') : null;
+const STAGE_MIN = 1;
+const STAGE_MAX = 5;
+const STAGE_KEYS = new Set([
+  'stage','estagio','stage_level','estagio_level','nivel_estagio',
+  'nivelestagio','current_stage','currentestagio','id_estagio','idstage','level','nivel'
+]);
+
+let inFlight = false;
+let running = true;
+
+function stageImage(level){
+  return `Nivel%20estagio/estagio${level}.jpg`;
+}
+function normalizeStage(value){
+  const parsed = Number.parseInt(value, 10);
+  if(!Number.isInteger(parsed)) return null;
+  return Math.min(STAGE_MAX, Math.max(STAGE_MIN, parsed));
+}
+function parseLevelValue(value){
+  if(typeof value === 'number' && Number.isFinite(value)) return Math.trunc(value);
+  if(typeof value !== 'string') return null;
+  const m = value.trim().match(/-?\d+/);
+  if(!m) return null;
+  return Number.parseInt(m[0], 10);
+}
+function extractLevel(payload, keys, seen = new WeakSet()){
+  if(typeof payload === 'number' || typeof payload === 'string') return parseLevelValue(payload);
+  if(!payload || typeof payload !== 'object') return null;
+  if(seen.has(payload)) return null;
+  seen.add(payload);
+  if(Array.isArray(payload)){
+    for(const item of payload){
+      const found = extractLevel(item, keys, seen);
+      if(found !== null) return found;
+    }
+    return null;
+  }
+  for(const [rawKey, value] of Object.entries(payload)){
+    const key = String(rawKey).toLowerCase();
+    if(keys.has(key)){
+      const found = parseLevelValue(value);
+      if(found !== null) return found;
+    }
+    if(value && typeof value === 'object'){
+      const nested = extractLevel(value, keys, seen);
+      if(nested !== null) return nested;
+    }
+  }
+  return null;
+}
+function renderStage(level){
+  const normalized = normalizeStage(level);
+  if(normalized === null) return;
+  document.body.style.backgroundImage = `url('${stageImage(normalized)}')`;
+}
+function applyStateObject(state){
+  if(!state || typeof state !== 'object') return;
+  if(!('stage' in state)) return;
+  renderStage(state.stage);
+}
+async function fetchPayload(url){
+  const res = await fetch(url, { method:'GET', cache:'no-store' });
+  if(!res.ok) throw new Error(`HTTP ${res.status}`);
+  const text = await res.text();
+  if(!text) return null;
+  try{ return JSON.parse(text); }catch(e){ return text.trim(); }
+}
+async function pollLoop(){
+  if(!running) return;
+  if(inFlight){
+    setTimeout(pollLoop, 0);
+    return;
+  }
+  inFlight = true;
+  try{
+    const payload = await fetchPayload(API_URL);
+    const level = extractLevel(payload, STAGE_KEYS);
+    if(level !== null) renderStage(level);
+  }catch(e){
+  }finally{
+    inFlight = false;
+    setTimeout(pollLoop, 0);
+  }
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  try{
+    const savedRaw = localStorage.getItem(LS_KEY);
+    if(savedRaw){
+      const saved = JSON.parse(savedRaw);
+      applyStateObject(saved);
+    }else{
+      renderStage(1);
+    }
+  }catch(e){
+    renderStage(1);
+  }
+
+  if(BC){
+    BC.addEventListener('message', (event)=>applyStateObject(event.data));
+  }
+  window.addEventListener('storage', (event)=>{
+    if(event.key !== LS_KEY || !event.newValue) return;
+    try{ applyStateObject(JSON.parse(event.newValue)); }catch(e){}
+  });
+
+  pollLoop();
+});
+</script>
+</body>
+</html>

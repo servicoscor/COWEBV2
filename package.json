@@ -1,0 +1,28 @@
+{
+  "name": "cowebv2",
+  "version": "1.0.0",
+  "description": "Painel COWEBV2 com banco interno SQLite",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js",
+    "test": "node --check index.js && node --check server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/servicoscor/COWEBV2.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/servicoscor/COWEBV2/issues"
+  },
+  "homepage": "https://github.com/servicoscor/COWEBV2#readme",
+  "dependencies": {
+    "better-sqlite3": "^12.6.2",
+    "cors": "^2.8.6",
+    "express": "^5.2.1"
+  }
+}
