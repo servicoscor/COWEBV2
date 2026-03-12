@@ -673,12 +673,14 @@ nav.sidebar {
   display:flex; flex-direction:column; gap:8px;
 }
 .link-box-title { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; }
+.link-row { display:flex; gap:8px; align-items:center; }
 .link-url {
   font-family:'Share Tech Mono',monospace; font-size:11px;
   color:var(--cyan); background:rgba(0,0,0,0.3);
   border:1px solid rgba(34,211,238,0.15);
   border-radius:5px; padding:6px 10px;
   word-break:break-all;
+  flex:1;
 }
 .btn-copy {
   padding:8px; border-radius:6px; border:none;
@@ -877,6 +879,7 @@ nav.sidebar {
   .inp { padding: 10px 12px; font-size: 16px; } /* 16px evita zoom no iOS */
   .btn { padding: 11px 14px; font-size: 14px; }
   .btn-xs { padding: 7px 14px; font-size: 12px; }
+  .link-row { flex-direction:column; align-items:stretch; }
 
   /* col-flex panels internos */
   .col-flex { overflow: visible; height: auto; }
@@ -1467,9 +1470,15 @@ nav.sidebar {
           </div>
 
           <div class="link-box">
-            <span class="link-box-title">🖥 Link da Tela Pública (Telão)</span>
-            <span class="link-url" id="tela-url">—</span>
-            <button class="btn-copy" id="btn-copy-link" onclick="copyTelaLink()">📋 Copiar Link do Telão</button>
+            <span class="link-box-title">Links da Tela Publica</span>
+            <div class="link-row">
+              <span class="link-url" id="tela-url-stage">-</span>
+              <button class="btn-copy" id="btn-copy-link-stage" onclick="copyTelaLink('stage')">Copiar Link Estagio</button>
+            </div>
+            <div class="link-row">
+              <span class="link-url" id="tela-url-heat">-</span>
+              <button class="btn-copy" id="btn-copy-link-heat" onclick="copyTelaLink('heat')">Copiar Link Calor</button>
+            </div>
           </div>
         </div>
       </div>
@@ -1823,26 +1832,38 @@ function resetAlert(){
   applyAlert();
 }
 
-/* ===== LINK DO TELAO ===== */
-function buildTelaUrl(){
+/* ===== LINKS DAS TELAS PUBLICAS ===== */
+function buildTelaUrl(type){
   const base = location.href.substring(0, location.href.lastIndexOf('/') + 1);
-  return base + 'cor_rio_telao.html';
+  if(type === 'heat') return base + 'cor_rio_telao_calor.html';
+  return base + 'cor_rio_telao_estagio.html';
 }
-function copyTelaLink(){
-  const url = buildTelaUrl();
+
+function copyTelaLink(type){
+  const view = type === 'heat' ? 'heat' : 'stage';
+  const url = buildTelaUrl(view);
+  const btnId = view === 'heat' ? 'btn-copy-link-heat' : 'btn-copy-link-stage';
+  const btn = document.getElementById(btnId);
+  const defaultLabel = view === 'heat' ? 'Copiar Link Calor' : 'Copiar Link Estagio';
+
   navigator.clipboard.writeText(url).then(()=>{
-    const btn = document.getElementById('btn-copy-link');
+    if(!btn) return;
     btn.classList.add('copied');
     btn.textContent = 'Link Copiado!';
-    setTimeout(()=>{ btn.classList.remove('copied'); btn.textContent='Copiar Link do Telao'; },2500);
+    setTimeout(()=>{
+      btn.classList.remove('copied');
+      btn.textContent = defaultLabel;
+    },2500);
   }).catch(()=>{
     prompt('Copie o link abaixo:', url);
   });
 }
 // Show URL in box
 window.addEventListener('DOMContentLoaded',()=>{
-  const el = document.getElementById('tela-url');
-  if(el) el.textContent = buildTelaUrl();
+  const elStage = document.getElementById('tela-url-stage');
+  const elHeat = document.getElementById('tela-url-heat');
+  if(elStage) elStage.textContent = buildTelaUrl('stage');
+  if(elHeat) elHeat.textContent = buildTelaUrl('heat');
   const hdrCalor = document.querySelector('.h-calor');
   if(hdrCalor){
     hdrCalor.setAttribute('role', 'button');
