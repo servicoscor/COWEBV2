@@ -1,0 +1,1427 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>COR Rio — Centro de Operações e Resiliência</title>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@300;400;600;700;800;900&family=Barlow:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<style>
+/* ============================
+   RESET & VARIABLES
+============================ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --azul:       #0a2a5e;
+  --azul-mid:   #0d3880;
+  --azul-light: #1a5fb4;
+  --verde:      #1b5e1b;
+  --verde-btn:  #22a822;
+  --status-on:  #22c55e;
+  --status-off: #ef4444;
+  --warn:       #f59e0b;
+  --panel-bg:   rgba(4,18,44,0.88);
+  --panel-bg2:  rgba(6,24,54,0.92);
+  --border:     rgba(255,255,255,0.07);
+  --border2:    rgba(100,160,255,0.15);
+  --text:       #d8eaff;
+  --text-dim:   #6a96c8;
+  --text-muted: #3a5a88;
+  --gold:       #f0b429;
+  --cyan:       #22d3ee;
+  --red-alert:  #dc2626;
+}
+
+html, body {
+  height: 100%;
+  font-family: 'Barlow', sans-serif;
+  background: #04101e;
+  color: var(--text);
+  overflow: hidden;
+}
+
+/* ============================
+   ANIMATED SCANLINE BG
+============================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(0,0,0,0.06) 2px,
+    rgba(0,0,0,0.06) 4px
+  );
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.4;
+}
+
+/* ============================
+   HEADER
+============================ */
+header {
+  display: flex;
+  align-items: stretch;
+  height: 62px;
+  position: relative;
+  z-index: 200;
+  box-shadow: 0 4px 30px rgba(0,0,0,0.6);
+}
+
+/* Estágio */
+.h-estagio {
+  background: linear-gradient(135deg, #217021 0%, #154f15 100%);
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0 18px;
+  min-width: 185px;
+  border-right: 1px solid rgba(255,255,255,0.12);
+}
+
+.badge-circle {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #3dd63d, #1a8a1a);
+  border: 2px solid rgba(255,255,255,0.35);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 18px rgba(40,200,40,0.35), inset 0 1px 0 rgba(255,255,255,0.2);
+  animation: glow-green 3s ease-in-out infinite;
+}
+@keyframes glow-green {
+  0%,100% { box-shadow: 0 0 14px rgba(40,200,40,0.3); }
+  50%      { box-shadow: 0 0 28px rgba(40,220,40,0.55); }
+}
+.badge-circle .bn { font-family: 'Barlow Condensed',sans-serif; font-size: 22px; font-weight: 900; color:#fff; line-height:1; }
+.badge-circle .bs { font-size:7px; font-weight:700; color:rgba(255,255,255,0.75); letter-spacing:.5px; text-transform:uppercase; }
+
+.estagio-label { display:flex; flex-direction:column; }
+.estagio-label .sm { font-size:9px; font-weight:600; color:rgba(255,255,255,0.65); text-transform:uppercase; letter-spacing:1.5px; }
+.estagio-label .lg { font-family:'Barlow Condensed',sans-serif; font-size:22px; font-weight:900; color:#fff; text-transform:uppercase; line-height:1; letter-spacing:.5px; }
+
+/* Logo */
+.h-logo {
+  flex:1;
+  background: linear-gradient(135deg, #0e3a82 0%, #071e4a 50%, #0a2560 100%);
+  display:flex; align-items:center; justify-content:center; gap:22px;
+  border-right:1px solid rgba(255,255,255,0.1);
+  position:relative; overflow:hidden;
+}
+.h-logo::after {
+  content:'';
+  position:absolute; inset:0;
+  background: radial-gradient(ellipse at 50% 120%, rgba(30,90,200,0.2) 0%, transparent 65%);
+}
+.logo-left { display:flex; flex-direction:column; align-items:center; }
+.logo-left .pref { font-family:'Barlow Condensed',sans-serif; font-size:10px; font-weight:700; letter-spacing:6px; color:rgba(255,255,255,0.8); text-transform:uppercase; }
+.logo-left .rio  { font-family:'Barlow Condensed',sans-serif; font-size:36px; font-weight:900; color:#fff; line-height:.9; letter-spacing:3px; }
+.logo-sep { width:1px; height:38px; background:rgba(255,255,255,0.25); }
+.logo-right { display:flex; flex-direction:column; gap:1px; }
+.logo-right span { font-family:'Barlow',sans-serif; font-size:13px; font-weight:500; color:rgba(255,255,255,0.88); line-height:1.35; }
+
+/* Calor */
+.h-calor {
+  background: linear-gradient(135deg, #1258b8 0%, #0a3070 100%);
+  display:flex; align-items:center; justify-content:center; flex-direction:column;
+  padding:0 22px; min-width:130px;
+  cursor:pointer; transition:all .2s;
+}
+.h-calor:hover { filter:brightness(1.2); }
+.calor-label { font-size:9px; font-weight:600; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1.5px; }
+.calor-value { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:900; color:#fff; letter-spacing:2px; line-height:1; }
+
+/* datetime */
+.h-clock {
+  background: rgba(4,18,44,0.95);
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:0 18px; border-left:1px solid var(--border);
+  min-width:110px;
+}
+.clock-time { font-family:'Share Tech Mono',monospace; font-size:18px; color:var(--cyan); letter-spacing:2px; }
+.clock-date { font-size:10px; color:var(--text-dim); letter-spacing:.5px; margin-top:2px; }
+
+/* ============================
+   LAYOUT
+============================ */
+.wrapper {
+  display:flex;
+  height: calc(100vh - 62px);
+  position:relative;
+}
+
+.bg-scene {
+  position:absolute; inset:0; z-index:0;
+  background:
+    radial-gradient(ellipse at 30% 80%, rgba(8,30,80,0.6) 0%, transparent 55%),
+    radial-gradient(ellipse at 80% 20%, rgba(6,40,100,0.4) 0%, transparent 50%),
+    linear-gradient(180deg, #03111f 0%, #040e1c 100%);
+}
+
+/* ============================
+   SIDEBAR
+============================ */
+nav.sidebar {
+  position:relative; z-index:50;
+  width:188px; flex-shrink:0;
+  display:flex; flex-direction:column;
+  padding:14px 10px;
+  background:rgba(3,12,28,0.82);
+  border-right:1px solid var(--border);
+  backdrop-filter:blur(10px);
+  gap:5px;
+}
+
+.nav-section-title {
+  font-size:9px; font-weight:700;
+  color:var(--text-muted); text-transform:uppercase;
+  letter-spacing:2px; padding:8px 6px 4px;
+}
+
+.nav-btn {
+  display:flex; align-items:center; gap:9px;
+  padding:10px 12px;
+  border-radius:7px; border:1px solid transparent;
+  background:transparent;
+  color:var(--text-dim);
+  font-family:'Barlow',sans-serif; font-size:12.5px; font-weight:600;
+  cursor:pointer; text-align:left;
+  transition:all .2s;
+  position:relative; overflow:hidden;
+}
+.nav-btn::before {
+  content:'';
+  position:absolute; left:0; top:0; bottom:0; width:3px;
+  background:var(--azul-light); border-radius:0 3px 3px 0;
+  transform:scaleY(0); transition:transform .2s;
+}
+.nav-btn:hover {
+  background:rgba(20,60,130,0.45); color:var(--text);
+  border-color:var(--border2);
+}
+.nav-btn.active {
+  background:linear-gradient(135deg, rgba(20,75,170,0.6), rgba(10,45,110,0.6));
+  border-color:rgba(80,150,255,0.3);
+  color:#fff;
+  box-shadow:0 0 16px rgba(20,80,200,0.25);
+}
+.nav-btn.active::before { transform:scaleY(1); }
+.nav-btn .icon { font-size:16px; flex-shrink:0; }
+
+.nav-divider { height:1px; background:var(--border); margin:6px 0; }
+
+/* ============================
+   CONTENT AREA
+============================ */
+.content {
+  position:relative; z-index:10;
+  flex:1; overflow:hidden;
+  display:flex; flex-direction:column;
+}
+
+.section { display:none; width:100%; height:100%; padding:14px; overflow:hidden; }
+.section.active { display:flex; gap:13px; animation:fadeIn .3s ease; }
+@keyframes fadeIn { from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:translateY(0)} }
+
+/* ============================
+   PANELS
+============================ */
+.panel {
+  background:var(--panel-bg);
+  border:1px solid var(--border);
+  border-radius:10px;
+  backdrop-filter:blur(14px);
+  display:flex; flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 8px 32px rgba(0,0,0,0.4);
+}
+
+.ph {
+  display:flex; align-items:center; gap:9px;
+  padding:12px 16px 10px;
+  border-bottom:1px solid var(--border);
+  flex-shrink:0;
+}
+.ph-icon { font-size:18px; }
+.ph-title {
+  font-family:'Barlow Condensed',sans-serif;
+  font-size:18px; font-weight:700;
+  color:#e4f0ff; letter-spacing:.3px;
+}
+.ph-badge {
+  margin-left:auto; padding:2px 10px;
+  border-radius:20px; font-size:11px; font-weight:700;
+  background:rgba(30,80,180,0.4); border:1px solid var(--border2);
+  color:var(--cyan);
+}
+
+.pb {
+  flex:1; padding:13px 15px;
+  overflow-y:auto;
+}
+.pb::-webkit-scrollbar { width:4px; }
+.pb::-webkit-scrollbar-track { background:transparent; }
+.pb::-webkit-scrollbar-thumb { background:rgba(80,140,255,0.2); border-radius:2px; }
+
+/* ============================
+   FORM ELEMENTS
+============================ */
+.inp {
+  width:100%;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.09);
+  border-radius:6px;
+  color:var(--text-dim);
+  font-family:'Barlow',sans-serif; font-size:12.5px;
+  padding:8px 12px; outline:none;
+  transition:border-color .2s, color .2s;
+}
+.inp::placeholder { color:rgba(80,130,200,0.4); }
+.inp:focus { border-color:rgba(80,150,255,0.4); color:#fff; }
+
+.btn {
+  width:100%; padding:9px 14px;
+  border-radius:6px; border:none;
+  font-family:'Barlow',sans-serif; font-size:13px; font-weight:600;
+  cursor:pointer; transition:all .2s;
+}
+.btn-ghost {
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.09);
+  color:var(--text-dim);
+}
+.btn-ghost:hover { background:rgba(255,255,255,0.1); color:#fff; }
+.btn-primary {
+  background:linear-gradient(135deg, #1a5fb4, #0d3880);
+  color:#fff; border:1px solid rgba(80,150,255,0.3);
+  box-shadow:0 4px 12px rgba(15,60,180,0.3);
+}
+.btn-primary:hover { filter:brightness(1.2); transform:translateY(-1px); }
+.btn-danger { background:linear-gradient(135deg,#8c1a1a,#5a0d0d); color:#fca5a5; border:1px solid rgba(220,50,50,0.3); }
+.btn-success { background:linear-gradient(135deg,#166016,#0d3d0d); color:#86efac; border:1px solid rgba(50,180,50,0.3); }
+
+/* ============================
+   STATUS DOTS
+============================ */
+.dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.dot-on  { background:var(--status-on);  box-shadow:0 0 7px rgba(34,197,94,.6);  animation:blink 2.5s infinite; }
+.dot-off { background:var(--status-off); box-shadow:0 0 7px rgba(239,68,68,.4); }
+.dot-warn{ background:var(--warn);       box-shadow:0 0 7px rgba(245,158,11,.5); animation:blink 1.5s infinite; }
+@keyframes blink { 0%,100%{opacity:1} 50%{opacity:.45} }
+
+/* ============================
+   SECTION 1: GERENCIAR SISTEMAS
+============================ */
+.s1-reg { width:248px; flex-shrink:0; }
+.s1-list { flex:1; }
+.s1-top { width:265px; flex-shrink:0; }
+
+.status-row { display:flex; gap:10px; margin-bottom:14px; }
+.spill { display:flex; align-items:center; gap:6px; font-size:13px; font-weight:700; }
+.spill .lbl { color:var(--text-dim); }
+.count-g { background:#1a4d1a; color:#5edb5e; padding:2px 10px; border-radius:4px; font-weight:800; font-size:13px; }
+.count-r { background:#4d1a1a; color:#ff7070; padding:2px 10px; border-radius:4px; font-weight:800; font-size:13px; }
+
+.fg { display:flex; flex-direction:column; gap:7px; margin-bottom:10px; }
+.btn-row { display:flex; flex-direction:column; gap:6px; margin-bottom:8px; }
+.export-row { display:flex; align-items:center; justify-content:space-between; padding:8px 0; border-top:1px solid var(--border); font-size:12px; color:var(--text-dim); }
+.btn-xs { background:rgba(30,70,160,0.45); border:1px solid var(--border2); border-radius:5px; color:#8abcf0; font-size:11.5px; font-weight:600; padding:5px 14px; cursor:pointer; font-family:'Barlow',sans-serif; transition:all .2s; }
+.btn-xs:hover { background:rgba(30,70,160,0.75); color:#fff; }
+
+.search-inp {
+  width:100%; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.09);
+  border-radius:6px; color:var(--text-dim); font-family:'Barlow',sans-serif; font-size:12px;
+  padding:8px 12px; outline:none; margin-bottom:11px;
+}
+.search-inp::placeholder { color:rgba(80,130,200,0.4); }
+.search-inp:focus { border-color:rgba(80,150,255,0.35); }
+
+.filter-row { display:flex; gap:6px; margin-bottom:13px; flex-wrap:wrap; }
+.fbtn {
+  padding:5px 14px; border-radius:5px; border:1px solid rgba(255,255,255,0.09);
+  font-family:'Barlow',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:all .2s;
+}
+.fbtn.on { background:#183d18; border-color:#28a028; color:#7ef07e; }
+.fbtn:not(.on) { background:rgba(255,255,255,0.05); color:var(--text-dim); }
+.fbtn:not(.on):hover { background:rgba(255,255,255,0.1); color:#fff; }
+
+.sys-card { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:12px 15px; margin-bottom:8px; transition:border-color .2s; }
+.sys-card:hover { border-color:var(--border2); }
+.sys-name { font-family:'Barlow Condensed',sans-serif; font-size:17px; font-weight:700; color:#ddeeff; margin-bottom:3px; }
+.sys-status { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--text-dim); margin-bottom:8px; }
+.sys-acts { display:flex; gap:14px; }
+.sys-acts a { font-size:12.5px; font-weight:600; color:#4a9ce0; cursor:pointer; text-decoration:none; transition:color .2s; }
+.sys-acts a:hover { color:#fff; text-decoration:underline; }
+
+.top-item { display:flex; align-items:center; gap:9px; padding:8px 6px; border-bottom:1px solid var(--border); cursor:pointer; border-radius:5px; transition:background .15s; }
+.top-item:hover { background:rgba(255,255,255,0.04); }
+.ti-icon { width:28px; height:28px; border-radius:5px; background:rgba(20,55,130,0.55); border:1px solid var(--border2); display:flex; align-items:center; justify-content:center; font-size:13px; flex-shrink:0; }
+.ti-info { flex:1; min-width:0; }
+.ti-name { font-size:12.5px; font-weight:700; color:#5aaaf0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; margin-bottom:1px; }
+.ti-meta { font-size:10px; color:var(--text-dim); }
+.ti-cnt { font-size:11px; color:rgba(160,200,255,0.55); flex-shrink:0; }
+.ti-badge { width:22px; height:22px; border-radius:4px; background:#1a3a80; border:1px solid var(--border2); display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700; color:#4a9aff; flex-shrink:0; }
+
+/* ============================
+   SECTION 2: ANYDESK
+============================ */
+.anydesk-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:10px; }
+
+.ad-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border);
+  border-radius:9px; padding:14px;
+  transition:all .25s; cursor:pointer;
+  position:relative; overflow:hidden;
+}
+.ad-card::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0; height:2px;
+  background:linear-gradient(90deg, transparent, var(--azul-light), transparent);
+  opacity:0; transition:opacity .3s;
+}
+.ad-card:hover { border-color:var(--border2); transform:translateY(-2px); box-shadow:0 8px 24px rgba(0,0,0,0.4); }
+.ad-card:hover::before { opacity:1; }
+.ad-card.connected { border-color:rgba(34,197,94,0.2); }
+.ad-card.connected::before { background:linear-gradient(90deg, transparent, var(--status-on), transparent); opacity:0.6; }
+
+.ad-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.ad-icon { font-size:24px; }
+.ad-status-badge {
+  display:flex; align-items:center; gap:5px;
+  font-size:10.5px; font-weight:700;
+  padding:2px 8px; border-radius:20px;
+}
+.ad-status-badge.on  { background:rgba(34,197,94,0.15); color:var(--status-on); border:1px solid rgba(34,197,94,0.25); }
+.ad-status-badge.off { background:rgba(239,68,68,0.1);  color:#f87171;          border:1px solid rgba(239,68,68,0.2); }
+.ad-status-badge.warn{ background:rgba(245,158,11,0.12);color:var(--warn);      border:1px solid rgba(245,158,11,0.25); }
+
+.ad-name { font-family:'Barlow Condensed',sans-serif; font-size:16px; font-weight:700; color:#d8eeff; margin-bottom:2px; }
+.ad-id   { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--text-dim); margin-bottom:6px; letter-spacing:.5px; }
+.ad-meta { font-size:10.5px; color:var(--text-muted); margin-bottom:10px; }
+
+.ad-btn {
+  width:100%; padding:7px; border-radius:6px; border:none;
+  font-family:'Barlow',sans-serif; font-size:12px; font-weight:700;
+  cursor:pointer; transition:all .2s; text-transform:uppercase; letter-spacing:.5px;
+}
+.ad-btn-connect { background:linear-gradient(135deg,#155f15,#0d3d0d); color:#86efac; border:1px solid rgba(50,180,50,0.3); }
+.ad-btn-connect:hover { filter:brightness(1.25); }
+.ad-btn-manage  { background:rgba(20,60,150,0.45); color:#90beff; border:1px solid var(--border2); }
+.ad-btn-manage:hover  { background:rgba(20,60,150,0.7); color:#fff; }
+
+.ad-sidebar { width:240px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+.ad-main { flex:1; overflow-y:auto; }
+.ad-main::-webkit-scrollbar { width:4px; }
+.ad-main::-webkit-scrollbar-thumb { background:rgba(80,140,255,0.2); border-radius:2px; }
+
+.stat-box { background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:8px; padding:12px; }
+.stat-box-title { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; margin-bottom:10px; }
+.stat-row { display:flex; align-items:center; justify-content:space-between; padding:5px 0; border-bottom:1px solid var(--border); }
+.stat-row:last-child { border:none; }
+.stat-label { font-size:12px; color:var(--text-dim); }
+.stat-val { font-family:'Share Tech Mono',monospace; font-size:12px; }
+.val-green { color:var(--status-on); }
+.val-red   { color:#f87171; }
+.val-warn  { color:var(--warn); }
+.val-cyan  { color:var(--cyan); }
+
+/* ============================
+   SECTION 3: INFRAESTRUTURA
+============================ */
+.infra-main { flex:1; display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+.infra-side { width:260px; flex-shrink:0; display:flex; flex-direction:column; gap:12px; }
+
+.gauge-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:0; }
+
+.gauge-card {
+  background:rgba(255,255,255,0.03); border:1px solid var(--border); border-radius:9px;
+  padding:14px; display:flex; flex-direction:column; align-items:center; gap:8px;
+}
+.gauge-label { font-size:10px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; }
+.gauge-ring {
+  position:relative; width:76px; height:76px;
+}
+.gauge-ring svg { transform:rotate(-90deg); }
+.gauge-ring .track { fill:none; stroke:rgba(255,255,255,0.06); stroke-width:6; }
+.gauge-ring .fill  { fill:none; stroke-width:6; stroke-linecap:round; transition:stroke-dashoffset 1.5s ease; }
+.gauge-val {
+  position:absolute; inset:0; display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+}
+.gauge-val .pct { font-family:'Barlow Condensed',sans-serif; font-size:20px; font-weight:800; line-height:1; }
+.gauge-val .unit { font-size:9px; color:var(--text-muted); }
+
+.server-list { flex:1; overflow-y:auto; }
+.server-list::-webkit-scrollbar { width:3px; }
+.server-list::-webkit-scrollbar-thumb { background:rgba(80,140,255,0.15); }
+
+.srv-row {
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; border-radius:7px;
+  border:1px solid transparent; margin-bottom:6px;
+  background:rgba(255,255,255,0.025);
+  cursor:pointer; transition:all .2s;
+}
+.srv-row:hover { background:rgba(255,255,255,0.05); border-color:var(--border2); }
+.srv-row.selected { background:rgba(20,60,140,0.4); border-color:rgba(80,150,255,0.3); }
+.srv-icon { font-size:20px; flex-shrink:0; }
+.srv-info { flex:1; min-width:0; }
+.srv-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; color:#d0e8ff; }
+.srv-sub  { font-size:10.5px; color:var(--text-muted); margin-top:1px; }
+.srv-bars { display:flex; flex-direction:column; gap:3px; width:70px; }
+.mini-bar-wrap { display:flex; align-items:center; gap:5px; }
+.mini-bar-label { font-size:9px; color:var(--text-muted); width:22px; }
+.mini-bar { flex:1; height:4px; background:rgba(255,255,255,0.07); border-radius:2px; overflow:hidden; }
+.mini-bar-fill { height:100%; border-radius:2px; transition:width 1s ease; }
+
+.net-panel { display:flex; flex-direction:column; gap:8px; }
+.net-row { display:flex; align-items:center; gap:8px; padding:8px; border-radius:6px; background:rgba(255,255,255,0.025); }
+.net-name { font-size:12px; font-weight:600; color:var(--text-dim); width:100px; }
+.net-bar-wrap { flex:1; height:6px; background:rgba(255,255,255,0.06); border-radius:3px; overflow:hidden; }
+.net-bar-fill { height:100%; border-radius:3px; transition:width 1.5s ease; }
+.net-val { font-family:'Share Tech Mono',monospace; font-size:11px; color:var(--cyan); width:55px; text-align:right; }
+
+.log-box {
+  flex:1; background:rgba(0,0,0,0.4); border:1px solid var(--border);
+  border-radius:8px; padding:10px; overflow-y:auto; font-family:'Share Tech Mono',monospace; font-size:10.5px;
+}
+.log-box::-webkit-scrollbar { width:3px; }
+.log-box::-webkit-scrollbar-thumb { background:rgba(80,140,255,0.15); }
+.log-line { padding:3px 0; border-bottom:1px solid rgba(255,255,255,0.03); display:flex; gap:8px; }
+.log-time { color:var(--text-muted); flex-shrink:0; }
+.log-lvl-ok   { color:var(--status-on); width:40px; flex-shrink:0; }
+.log-lvl-warn { color:var(--warn);       width:40px; flex-shrink:0; }
+.log-lvl-err  { color:#f87171;           width:40px; flex-shrink:0; }
+.log-msg { color:var(--text-dim); }
+
+/* ============================
+   SECTION 4: ACESSO RÁPIDO
+============================ */
+.qr-grid {
+  display:grid;
+  grid-template-columns: repeat(auto-fill, minmax(145px,1fr));
+  gap:10px; align-content:start;
+}
+
+.qr-card {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border); border-radius:10px;
+  padding:18px 14px; display:flex; flex-direction:column;
+  align-items:center; gap:10px; cursor:pointer;
+  transition:all .25s; text-align:center;
+  position:relative; overflow:hidden;
+}
+.qr-card::after {
+  content:'';
+  position:absolute; inset:0;
+  background:radial-gradient(circle at 50% 0%, rgba(80,150,255,0.1) 0%, transparent 70%);
+  opacity:0; transition:opacity .3s;
+}
+.qr-card:hover { border-color:var(--border2); transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,0.5); }
+.qr-card:hover::after { opacity:1; }
+
+.qr-icon { font-size:32px; line-height:1; filter:drop-shadow(0 4px 8px rgba(0,0,0,0.4)); }
+.qr-name { font-family:'Barlow Condensed',sans-serif; font-size:14px; font-weight:700; color:#c8e0ff; letter-spacing:.2px; line-height:1.2; }
+.qr-type { font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:1px; }
+.qr-status { display:flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; }
+
+.qr-section { flex:1; overflow-y:auto; }
+.qr-section::-webkit-scrollbar { width:3px; }
+.qr-section::-webkit-scrollbar-thumb { background:rgba(80,140,255,0.15); }
+
+.qr-cat-title {
+  font-family:'Barlow Condensed',sans-serif; font-size:13px; font-weight:700;
+  color:var(--text-muted); text-transform:uppercase; letter-spacing:2px;
+  padding:10px 0 6px; display:flex; align-items:center; gap:8px;
+}
+.qr-cat-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.qr-sidebar { width:220px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+
+.recent-list { display:flex; flex-direction:column; gap:5px; }
+.recent-item {
+  display:flex; align-items:center; gap:9px;
+  padding:8px 10px; border-radius:7px; cursor:pointer;
+  border:1px solid transparent; background:rgba(255,255,255,0.025);
+  transition:all .2s;
+}
+.recent-item:hover { background:rgba(255,255,255,0.06); border-color:var(--border2); }
+.recent-icon { font-size:18px; }
+.recent-info .rname { font-size:12.5px; font-weight:700; color:#a8d0f0; }
+.recent-info .rmeta { font-size:10px; color:var(--text-muted); }
+
+/* ============================
+   SECTION 5: ESTÁGIO / CALOR
+============================ */
+.stage-wrap { flex:1; display:flex; flex-direction:column; gap:14px; overflow-y:auto; }
+.stage-wrap::-webkit-scrollbar { width:4px; }
+.stage-wrap::-webkit-scrollbar-thumb { background:rgba(80,140,255,0.15); }
+
+.alert-banner {
+  border-radius:10px; padding:16px 20px;
+  display:flex; align-items:center; gap:14px;
+  border:1px solid rgba(255,255,255,0.1);
+  font-family:'Barlow Condensed',sans-serif;
+  animation:fadeIn .4s ease;
+}
+.alert-banner.lvl1 { background:linear-gradient(135deg,rgba(30,100,30,0.4),rgba(20,70,20,0.4)); border-color:rgba(50,180,50,0.25); }
+.alert-banner.lvl2 { background:linear-gradient(135deg,rgba(140,100,10,0.4),rgba(100,70,5,0.4));  border-color:rgba(220,165,20,0.25); }
+.alert-banner.lvl3 { background:linear-gradient(135deg,rgba(160,60,10,0.4),rgba(120,40,5,0.4));   border-color:rgba(240,100,20,0.25); }
+.alert-banner.lvl4 { background:linear-gradient(135deg,rgba(180,20,20,0.4),rgba(130,10,10,0.4));  border-color:rgba(250,50,50,0.25); animation:pulse-red 1.5s infinite; }
+@keyframes pulse-red { 0%,100%{box-shadow:0 0 0 rgba(200,0,0,0)} 50%{box-shadow:0 0 20px rgba(200,0,0,0.25)} }
+
+.ab-icon { font-size:36px; }
+.ab-info .ab-title { font-size:22px; font-weight:800; letter-spacing:.5px; color:#fff; }
+.ab-info .ab-sub   { font-size:13px; font-weight:500; color:rgba(255,255,255,0.65); margin-top:2px; }
+
+.stages-row { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+.stage-btn {
+  border-radius:9px; padding:16px 8px; text-align:center; cursor:pointer;
+  border:2px solid transparent; transition:all .25s;
+  background:rgba(255,255,255,0.03);
+  font-family:'Barlow Condensed',sans-serif;
+}
+.stage-btn:hover { transform:translateY(-3px); border-color:var(--border2); }
+.stage-btn.sel { border-color:rgba(80,200,80,0.5); background:rgba(30,100,30,0.4); box-shadow:0 0 20px rgba(30,150,30,0.25); }
+.stage-btn.sel.red { border-color:rgba(220,50,50,0.5); background:rgba(120,20,20,0.4); box-shadow:0 0 20px rgba(200,30,30,0.25); }
+.stage-num { font-size:36px; font-weight:900; color:#fff; margin-bottom:4px; }
+.stage-color { width:100%; height:4px; border-radius:2px; margin-bottom:8px; }
+.stage-desc { font-size:11px; font-weight:600; color:var(--text-dim); letter-spacing:.3px; }
+
+.heat-row { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+.heat-btn {
+  border-radius:9px; padding:14px 8px; text-align:center; cursor:pointer;
+  border:2px solid transparent; transition:all .25s;
+  background:rgba(255,255,255,0.03);
+  font-family:'Barlow Condensed',sans-serif;
+}
+.heat-btn:hover { transform:translateY(-3px); border-color:var(--border2); }
+.heat-btn.sel { border-color:rgba(30,100,220,0.5); background:rgba(15,50,140,0.45); box-shadow:0 0 20px rgba(20,80,200,0.25); }
+.heat-btn.sel.hot { border-color:rgba(220,80,20,0.5); background:rgba(120,40,10,0.4); box-shadow:0 0 20px rgba(220,60,10,0.25); }
+.heat-icon { font-size:28px; margin-bottom:4px; }
+.heat-label { font-size:14px; font-weight:800; color:#fff; }
+.heat-sub   { font-size:10px; font-weight:600; color:var(--text-dim); margin-top:2px; }
+
+.s5-side { width:240px; flex-shrink:0; display:flex; flex-direction:column; gap:10px; }
+.timeline { display:flex; flex-direction:column; gap:0; position:relative; }
+.timeline::before { content:''; position:absolute; left:14px; top:0; bottom:0; width:1px; background:var(--border); }
+.tl-item { display:flex; gap:12px; padding:10px 0; position:relative; }
+.tl-dot { width:9px; height:9px; border-radius:50%; margin-top:4px; flex-shrink:0; z-index:1; }
+.tl-dot.green { background:var(--status-on); box-shadow:0 0 6px rgba(34,197,94,.5); }
+.tl-dot.yellow{ background:var(--warn); }
+.tl-dot.gray  { background:rgba(255,255,255,0.2); }
+.tl-body .tl-time { font-size:10px; color:var(--text-muted); font-family:'Share Tech Mono',monospace; }
+.tl-body .tl-text { font-size:12px; color:var(--text-dim); margin-top:1px; }
+
+.apply-btn-wrap { margin-top:auto; padding-top:12px; }
+
+/* ============================
+   CLOCK
+============================ */
+.clock-update { font-family:'Share Tech Mono',monospace; }
+
+/* ============================
+   SECTION LAYOUT HELPERS
+============================ */
+.col-flex { display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+.link-box {
+  background:rgba(255,255,255,0.03);
+  border:1px solid var(--border2);
+  border-radius:8px; padding:12px 14px;
+  display:flex; flex-direction:column; gap:8px;
+}
+.link-box-title { font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:1.5px; }
+.link-url {
+  font-family:'Share Tech Mono',monospace; font-size:11px;
+  color:var(--cyan); background:rgba(0,0,0,0.3);
+  border:1px solid rgba(34,211,238,0.15);
+  border-radius:5px; padding:6px 10px;
+  word-break:break-all;
+}
+.btn-copy {
+  padding:8px; border-radius:6px; border:none;
+  background:linear-gradient(135deg,rgba(34,211,238,0.15),rgba(34,211,238,0.08));
+  border:1px solid rgba(34,211,238,0.25);
+  color:var(--cyan); font-family:'Barlow',sans-serif;
+  font-size:12.5px; font-weight:700; cursor:pointer; transition:all .2s;
+}
+.btn-copy:hover { background:rgba(34,211,238,0.25); color:#fff; }
+.btn-copy.copied { background:rgba(34,197,94,0.2); border-color:rgba(34,197,94,0.3); color:var(--status-on); }
+
+/* ============================
+   SECTION LAYOUT HELPERS
+============================ */
+.col-flex { display:flex; flex-direction:column; gap:12px; overflow:hidden; }
+</style>
+</head>
+<body>
+
+<!-- ========== HEADER ========== -->
+<header>
+  <div class="h-estagio">
+    <div class="badge-circle">
+      <span class="bn" id="hdr-estagio-num">1</span>
+      <span class="bs">Rio</span>
+    </div>
+    <div class="estagio-label">
+      <span class="sm">Cidade em</span>
+      <span class="lg">Estágio <span id="hdr-estagio-txt">1</span></span>
+    </div>
+  </div>
+
+  <div class="h-logo">
+    <div class="logo-left">
+      <span class="pref">P R E F E I T U R A</span>
+      <span class="rio">🏛 RIO</span>
+    </div>
+    <div class="logo-sep"></div>
+    <div class="logo-right">
+      <span>Centro de</span>
+      <span>Operações</span>
+      <span>e Resiliência</span>
+    </div>
+  </div>
+
+  <div class="h-calor" onclick="switchSection('s5')">
+    <span class="calor-label">Alerta</span>
+    <span class="calor-value" id="hdr-calor-txt">CALOR 1</span>
+  </div>
+
+  <div class="h-clock">
+    <span class="clock-time" id="clk-time">--:--:--</span>
+    <span class="clock-date" id="clk-date">---</span>
+  </div>
+</header>
+
+<!-- ========== WRAPPER ========== -->
+<div class="wrapper">
+  <div class="bg-scene"></div>
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <span class="nav-section-title">Operações</span>
+    <button class="nav-btn active" onclick="switchSection('s1')" data-sec="s1">
+      <span class="icon">🖥</span> Gerenciar Sistemas
+    </button>
+    <button class="nav-btn" onclick="switchSection('s2')" data-sec="s2">
+      <span class="icon">📡</span> Conexões AnyDesk
+    </button>
+    <div class="nav-divider"></div>
+    <span class="nav-section-title">Infraestrutura</span>
+    <button class="nav-btn" onclick="switchSection('s3')" data-sec="s3">
+      <span class="icon">⚙️</span> Infraestrutura Remota
+    </button>
+    <button class="nav-btn" onclick="switchSection('s4')" data-sec="s4">
+      <span class="icon">⚡</span> Painel de Acesso Rápido
+    </button>
+    <div class="nav-divider"></div>
+    <span class="nav-section-title">Alertas</span>
+    <button class="nav-btn" onclick="switchSection('s5')" data-sec="s5">
+      <span class="icon">🚨</span> Selecionar Estágio / Calor
+    </button>
+  </nav>
+
+  <!-- CONTENT -->
+  <div class="content">
+
+    <!-- ===== S1: GERENCIAR SISTEMAS ===== -->
+    <div class="section active" id="s1">
+      <!-- Registro -->
+      <div class="panel s1-reg">
+        <div class="ph"><span class="ph-icon">📋</span><span class="ph-title">Registro de Sistemas Web</span></div>
+        <div class="pb">
+          <div class="status-row">
+            <div class="spill"><span class="lbl">Online:</span><span class="count-g">1</span></div>
+            <div class="spill"><span class="lbl">Offline:</span><span class="count-r">0</span></div>
+          </div>
+          <div class="fg">
+            <input class="inp" type="text" placeholder="Nome do sistema">
+            <input class="inp" type="text" placeholder="URL do sistema">
+            <input class="inp" type="text" placeholder="Usuário de acesso">
+            <input class="inp" type="password" placeholder="Senha de acesso">
+            <input class="inp" type="text" placeholder="Contato responsável">
+          </div>
+          <div class="btn-row">
+            <button class="btn btn-ghost">Testar Conexão</button>
+            <button class="btn btn-ghost">Limpar Todos</button>
+            <button class="btn btn-ghost">Exportar .TXT</button>
+          </div>
+          <div class="export-row"><span>Exportar Ativos (1)</span><button class="btn-xs">Exportar</button></div>
+          <div class="export-row"><span>Exportar Inativos (0)</span><button class="btn-xs">Exportar</button></div>
+        </div>
+      </div>
+
+      <!-- Lista -->
+      <div class="panel s1-list">
+        <div class="ph"><span class="ph-icon">📁</span><span class="ph-title">Sistemas Registrados</span><span class="ph-badge">1 ativo</span></div>
+        <div class="pb">
+          <input class="search-inp" type="text" placeholder="Buscar sistema pelo nome...">
+          <div class="filter-row">
+            <button class="fbtn">Revalidar Todos</button>
+            <button class="fbtn on">Todos</button>
+            <button class="fbtn">Online</button>
+            <button class="fbtn">Off line</button>
+          </div>
+          <div class="sys-card">
+            <div class="sys-name">cautela</div>
+            <div class="sys-status"><span class="dot dot-on"></span> Online</div>
+            <div class="sys-acts"><a>Exibir</a><a>Editar</a><a>Excluir</a><a>Abrir</a></div>
+          </div>
+          <div class="sys-card">
+            <div class="sys-name">ocorrencias-rio</div>
+            <div class="sys-status"><span class="dot dot-on"></span> Online</div>
+            <div class="sys-acts"><a>Exibir</a><a>Editar</a><a>Excluir</a><a>Abrir</a></div>
+          </div>
+          <div class="sys-card">
+            <div class="sys-name">multivis-painel</div>
+            <div class="sys-status"><span class="dot dot-warn"></span> Verificando…</div>
+            <div class="sys-acts"><a>Exibir</a><a>Editar</a><a>Excluir</a><a>Abrir</a></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Top Acessos -->
+      <div class="panel s1-top">
+        <div class="ph"><span class="ph-icon">🏆</span><span class="ph-title">Top Acessos Gerais</span></div>
+        <div class="pb">
+          <div class="top-item"><div class="ti-icon">🖥</div><div class="ti-info"><div class="ti-name">Desktop - estágios</div><div class="ti-meta">anydesk · 29/09/2025</div></div><div class="ti-cnt">(41)</div><div class="ti-badge">lr</div></div>
+          <div class="top-item"><div class="ti-icon">🖥</div><div class="ti-info"><div class="ti-name">Desktop Apresentação - Patrimônio</div><div class="ti-meta">anydesk · 16/12/2025</div></div><div class="ti-cnt">(30)</div><div class="ti-badge">lr</div></div>
+          <div class="top-item"><div class="ti-icon">🖥</div><div class="ti-info"><div class="ti-name">Desktop Agenda - Recepção</div><div class="ti-meta">anydesk · 22/02/2026</div></div><div class="ti-cnt">(26)</div><div class="ti-badge">lr</div></div>
+          <div class="top-item"><div class="ti-icon">🖥</div><div class="ti-info"><div class="ti-name">Desktop - Tv da impressa</div><div class="ti-meta">anydesk · 10/10/2025</div></div><div class="ti-cnt">(25)</div><div class="ti-badge">lr</div></div>
+          <div class="top-item"><div class="ti-icon" style="background:rgba(255,180,40,0.1);border-color:rgba(255,180,40,0.2)">📺</div><div class="ti-info"><div class="ti-name" style="color:var(--gold)">Multivis</div><div class="ti-meta">painel · 02/03/2026</div></div><div class="ti-cnt">(21)</div><div class="ti-badge">lr</div></div>
+          <div class="top-item"><div class="ti-icon">🖥</div><div class="ti-info"><div class="ti-name">Desktop Agenda - Crise</div><div class="ti-meta">anydesk · 20/02/2026</div></div><div class="ti-cnt">(20)</div><div class="ti-badge">lr</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== S2: ANYDESK ===== -->
+    <div class="section" id="s2">
+      <div class="panel ad-sidebar col-flex">
+        <div class="ph"><span class="ph-icon">📡</span><span class="ph-title">AnyDesk</span></div>
+        <div class="pb col-flex" style="gap:10px">
+          <div class="stat-box">
+            <div class="stat-box-title">Status Geral</div>
+            <div class="stat-row"><span class="stat-label">Sessões ativas</span><span class="stat-val val-green">3</span></div>
+            <div class="stat-row"><span class="stat-label">Disponíveis</span><span class="stat-val val-cyan">8</span></div>
+            <div class="stat-row"><span class="stat-label">Offline</span><span class="stat-val val-red">2</span></div>
+            <div class="stat-row"><span class="stat-label">Tempo médio</span><span class="stat-val val-cyan">4h 22m</span></div>
+          </div>
+          <div class="stat-box">
+            <div class="stat-box-title">Última Sessão</div>
+            <div class="stat-row"><span class="stat-label">Desktop</span><span class="stat-val val-cyan">Estágios</span></div>
+            <div class="stat-row"><span class="stat-label">Usuário</span><span class="stat-val val-green">lr</span></div>
+            <div class="stat-row"><span class="stat-label">Duração</span><span class="stat-val">1h 12m</span></div>
+            <div class="stat-row"><span class="stat-label">Encerrada</span><span class="stat-val">10:20</span></div>
+          </div>
+          <div class="stat-box" style="flex:1">
+            <div class="stat-box-title">Pesquisar</div>
+            <input class="inp" style="margin-bottom:8px" type="text" placeholder="ID ou nome...">
+            <button class="btn btn-primary" style="margin-bottom:6px">Conectar por ID</button>
+            <button class="btn btn-ghost">Histórico Completo</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="flex:1;overflow:hidden">
+        <div class="ph"><span class="ph-icon">💻</span><span class="ph-title">Máquinas Cadastradas</span><span class="ph-badge">13 total</span></div>
+        <div class="pb ad-main">
+          <div class="anydesk-grid">
+            <div class="ad-card connected">
+              <div class="ad-header"><span class="ad-icon">🖥</span><span class="ad-status-badge on"><span class="dot dot-on"></span>Conectado</span></div>
+              <div class="ad-name">Desktop – Estágios</div>
+              <div class="ad-id">ID: 584 321 097</div>
+              <div class="ad-meta">Último: 29/09/2025 · 10:20 · lr</div>
+              <button class="ad-btn ad-btn-manage">Gerenciar</button>
+            </div>
+            <div class="ad-card connected">
+              <div class="ad-header"><span class="ad-icon">🖥</span><span class="ad-status-badge on"><span class="dot dot-on"></span>Conectado</span></div>
+              <div class="ad-name">Desktop Apresentação</div>
+              <div class="ad-id">ID: 721 048 335</div>
+              <div class="ad-meta">Último: 16/12/2025 · 22:25 · lr</div>
+              <button class="ad-btn ad-btn-manage">Gerenciar</button>
+            </div>
+            <div class="ad-card connected">
+              <div class="ad-header"><span class="ad-icon">🖥</span><span class="ad-status-badge on"><span class="dot dot-on"></span>Conectado</span></div>
+              <div class="ad-name">Desktop Agenda – Recepção</div>
+              <div class="ad-id">ID: 445 890 122</div>
+              <div class="ad-meta">Último: 22/02/2026 · 23:49 · lr</div>
+              <button class="ad-btn ad-btn-manage">Gerenciar</button>
+            </div>
+            <div class="ad-card">
+              <div class="ad-header"><span class="ad-icon">🖥</span><span class="ad-status-badge on"><span class="dot dot-on"></span>Online</span></div>
+              <div class="ad-name">Desktop – Tv da Imprensa</div>
+              <div class="ad-id">ID: 302 617 884</div>
+              <div class="ad-meta">Último: 10/10/2025 · 06:21 · lr</div>
+              <button class="ad-btn ad-btn-connect">Conectar</button>
+            </div>
+            <div class="ad-card">
+              <div class="ad-header"><span class="ad-icon">📺</span><span class="ad-status-badge on"><span class="dot dot-on"></span>Online</span></div>
+              <div class="ad-name">Multivis – Painel</div>
+              <div class="ad-id">ID: 198 754 003</div>
+              <div class="ad-meta">Último: 02/03/2026 · 08:08 · lr</div>
+              <button class="ad-btn ad-btn-connect">Conectar</button>
+            </div>
+            <div class="ad-card">
+              <div class="ad-header"><span class="ad-icon">🖥</span><span class="ad-status-badge on"><span class="dot dot-on"></span>Online</span></div>
+              <div class="ad-name">Desktop Agenda – Crise</div>
+              <div class="ad-id">ID: 633 210 774</div>
+              <div class="ad-meta">Último: 20/02/2026 · 09:51 · lr</div>
+              <button class="ad-btn ad-btn-connect">Conectar</button>
+            </div>
+            <div class="ad-card">
+              <div class="ad-header"><span class="ad-icon">🖥</span><span class="ad-status-badge warn"><span class="dot dot-warn"></span>Instável</span></div>
+              <div class="ad-name">Desktop – Patrimônio</div>
+              <div class="ad-id">ID: 877 021 559</div>
+              <div class="ad-meta">Último: 05/03/2026 · 14:10 · lr</div>
+              <button class="ad-btn ad-btn-connect">Tentar Conectar</button>
+            </div>
+            <div class="ad-card">
+              <div class="ad-header"><span class="ad-icon">🖥</span><span class="ad-status-badge off">Offline</span></div>
+              <div class="ad-name">Desktop – Sala Crise 2</div>
+              <div class="ad-id">ID: 512 308 246</div>
+              <div class="ad-meta">Último: 01/02/2026 · 18:44 · lr</div>
+              <button class="ad-btn ad-btn-manage" style="background:rgba(80,20,20,0.4);color:#fca5a5;border-color:rgba(200,50,50,0.3)">Offline</button>
+            </div>
+            <div class="ad-card">
+              <div class="ad-header"><span class="ad-icon">🖨</span><span class="ad-status-badge on"><span class="dot dot-on"></span>Online</span></div>
+              <div class="ad-name">Servidor de Impressão</div>
+              <div class="ad-id">ID: 940 173 625</div>
+              <div class="ad-meta">Último: 10/03/2026 · 07:30 · lr</div>
+              <button class="ad-btn ad-btn-connect">Conectar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== S3: INFRAESTRUTURA ===== -->
+    <div class="section" id="s3">
+      <div class="infra-main col-flex">
+        <!-- Gauges -->
+        <div class="panel" style="flex-shrink:0">
+          <div class="ph"><span class="ph-icon">📊</span><span class="ph-title">Recursos do Servidor Principal</span><span class="ph-badge" style="color:var(--status-on)">● Online</span></div>
+          <div class="pb" style="padding:14px 16px">
+            <div class="gauge-row">
+              <div class="gauge-card">
+                <span class="gauge-label">CPU</span>
+                <div class="gauge-ring">
+                  <svg width="76" height="76" viewBox="0 0 76 76">
+                    <circle class="track" cx="38" cy="38" r="32"/>
+                    <circle class="fill" id="g-cpu" cx="38" cy="38" r="32" stroke="#22d3ee"
+                      stroke-dasharray="201" stroke-dashoffset="100"/>
+                  </svg>
+                  <div class="gauge-val"><span class="pct" id="gv-cpu" style="color:#22d3ee">51%</span><span class="unit">uso</span></div>
+                </div>
+                <span style="font-size:10px;color:var(--text-muted);font-family:'Share Tech Mono',monospace">8 cores · 3.6GHz</span>
+              </div>
+              <div class="gauge-card">
+                <span class="gauge-label">RAM</span>
+                <div class="gauge-ring">
+                  <svg width="76" height="76" viewBox="0 0 76 76">
+                    <circle class="track" cx="38" cy="38" r="32"/>
+                    <circle class="fill" id="g-ram" cx="38" cy="38" r="32" stroke="#f0b429"
+                      stroke-dasharray="201" stroke-dashoffset="70"/>
+                  </svg>
+                  <div class="gauge-val"><span class="pct" id="gv-ram" style="color:#f0b429">65%</span><span class="unit">uso</span></div>
+                </div>
+                <span style="font-size:10px;color:var(--text-muted);font-family:'Share Tech Mono',monospace">21 / 32 GB</span>
+              </div>
+              <div class="gauge-card">
+                <span class="gauge-label">Disco</span>
+                <div class="gauge-ring">
+                  <svg width="76" height="76" viewBox="0 0 76 76">
+                    <circle class="track" cx="38" cy="38" r="32"/>
+                    <circle class="fill" id="g-disk" cx="38" cy="38" r="32" stroke="#22c55e"
+                      stroke-dasharray="201" stroke-dashoffset="130"/>
+                  </svg>
+                  <div class="gauge-val"><span class="pct" id="gv-disk" style="color:#22c55e">35%</span><span class="unit">uso</span></div>
+                </div>
+                <span style="font-size:10px;color:var(--text-muted);font-family:'Share Tech Mono',monospace">700 / 2000 GB</span>
+              </div>
+              <div class="gauge-card">
+                <span class="gauge-label">Rede ↓</span>
+                <div class="gauge-ring">
+                  <svg width="76" height="76" viewBox="0 0 76 76">
+                    <circle class="track" cx="38" cy="38" r="32"/>
+                    <circle class="fill" cx="38" cy="38" r="32" stroke="#a78bfa"
+                      stroke-dasharray="201" stroke-dashoffset="145"/>
+                  </svg>
+                  <div class="gauge-val"><span class="pct" style="color:#a78bfa">28%</span><span class="unit">banda</span></div>
+                </div>
+                <span style="font-size:10px;color:var(--text-muted);font-family:'Share Tech Mono',monospace">280 / 1000 Mbps</span>
+              </div>
+              <div class="gauge-card">
+                <span class="gauge-label">Rede ↑</span>
+                <div class="gauge-ring">
+                  <svg width="76" height="76" viewBox="0 0 76 76">
+                    <circle class="track" cx="38" cy="38" r="32"/>
+                    <circle class="fill" cx="38" cy="38" r="32" stroke="#f472b6"
+                      stroke-dasharray="201" stroke-dashoffset="165"/>
+                  </svg>
+                  <div class="gauge-val"><span class="pct" style="color:#f472b6">18%</span><span class="unit">banda</span></div>
+                </div>
+                <span style="font-size:10px;color:var(--text-muted);font-family:'Share Tech Mono',monospace">180 / 1000 Mbps</span>
+              </div>
+              <div class="gauge-card">
+                <span class="gauge-label">Uptime</span>
+                <div class="gauge-ring">
+                  <svg width="76" height="76" viewBox="0 0 76 76">
+                    <circle class="track" cx="38" cy="38" r="32"/>
+                    <circle class="fill" cx="38" cy="38" r="32" stroke="#22c55e"
+                      stroke-dasharray="201" stroke-dashoffset="4"/>
+                  </svg>
+                  <div class="gauge-val"><span class="pct" style="color:#22c55e;font-size:16px">99.8%</span><span class="unit">up</span></div>
+                </div>
+                <span style="font-size:10px;color:var(--text-muted);font-family:'Share Tech Mono',monospace">47d 12h 08m</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Log -->
+        <div class="panel" style="flex:1;overflow:hidden">
+          <div class="ph"><span class="ph-icon">📜</span><span class="ph-title">Log de Eventos</span><span class="ph-badge">Tempo real</span></div>
+          <div class="pb" style="padding:10px">
+            <div class="log-box" id="log-box">
+              <div class="log-line"><span class="log-time">12:03:01</span><span class="log-lvl-ok">[OK]</span><span class="log-msg">Backup automático concluído — 14.2 GB</span></div>
+              <div class="log-line"><span class="log-time">11:58:44</span><span class="log-lvl-ok">[OK]</span><span class="log-msg">Serviço multivis-api reiniciado com sucesso</span></div>
+              <div class="log-line"><span class="log-time">11:45:20</span><span class="log-lvl-warn">[WARN]</span><span class="log-msg">RAM acima de 60% por 15 minutos consecutivos</span></div>
+              <div class="log-line"><span class="log-time">11:30:10</span><span class="log-lvl-ok">[OK]</span><span class="log-msg">Sync do banco de dados finalizado</span></div>
+              <div class="log-line"><span class="log-time">10:55:02</span><span class="log-lvl-err">[ERR]</span><span class="log-msg">Timeout na conexão com host 192.168.1.44 — retentando</span></div>
+              <div class="log-line"><span class="log-time">10:50:33</span><span class="log-lvl-ok">[OK]</span><span class="log-msg">Reconexão com host 192.168.1.44 estabelecida</span></div>
+              <div class="log-line"><span class="log-time">10:44:18</span><span class="log-lvl-ok">[OK]</span><span class="log-msg">Deploy da versão 3.4.1 do painel de ocorrências</span></div>
+              <div class="log-line"><span class="log-time">10:20:05</span><span class="log-lvl-warn">[WARN]</span><span class="log-msg">Sessão AnyDesk (Estágios) encerrada inesperadamente</span></div>
+              <div class="log-line"><span class="log-time">09:15:00</span><span class="log-lvl-ok">[OK]</span><span class="log-msg">Verificação de integridade do RAID concluída</span></div>
+              <div class="log-line"><span class="log-time">08:00:00</span><span class="log-lvl-ok">[OK]</span><span class="log-msg">Sistema inicializado — todos os serviços ativos</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="infra-side">
+        <!-- Servidores -->
+        <div class="panel" style="flex:1;overflow:hidden">
+          <div class="ph"><span class="ph-icon">🗄</span><span class="ph-title">Nós da Rede</span><span class="ph-badge">9 online</span></div>
+          <div class="pb server-list">
+            <div class="srv-row selected">
+              <span class="srv-icon">🏢</span>
+              <div class="srv-info"><div class="srv-name">SRV-COR-PRINCIPAL</div><div class="srv-sub">192.168.1.1 · Ubuntu 22.04</div></div>
+              <div class="srv-bars">
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#22d3ee">CPU</span><div class="mini-bar"><div class="mini-bar-fill" style="width:51%;background:#22d3ee"></div></div></div>
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#f0b429">RAM</span><div class="mini-bar"><div class="mini-bar-fill" style="width:65%;background:#f0b429"></div></div></div>
+              </div>
+              <span class="dot dot-on"></span>
+            </div>
+            <div class="srv-row">
+              <span class="srv-icon">📦</span>
+              <div class="srv-info"><div class="srv-name">SRV-BACKUP-01</div><div class="srv-sub">192.168.1.10 · Debian 11</div></div>
+              <div class="srv-bars">
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#22d3ee">CPU</span><div class="mini-bar"><div class="mini-bar-fill" style="width:12%;background:#22d3ee"></div></div></div>
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#f0b429">RAM</span><div class="mini-bar"><div class="mini-bar-fill" style="width:34%;background:#22c55e"></div></div></div>
+              </div>
+              <span class="dot dot-on"></span>
+            </div>
+            <div class="srv-row">
+              <span class="srv-icon">🌐</span>
+              <div class="srv-info"><div class="srv-name">SRV-WEB-NGINX</div><div class="srv-sub">192.168.1.20 · Nginx 1.24</div></div>
+              <div class="srv-bars">
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#22d3ee">CPU</span><div class="mini-bar"><div class="mini-bar-fill" style="width:28%;background:#22d3ee"></div></div></div>
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#f0b429">RAM</span><div class="mini-bar"><div class="mini-bar-fill" style="width:45%;background:#f0b429"></div></div></div>
+              </div>
+              <span class="dot dot-on"></span>
+            </div>
+            <div class="srv-row">
+              <span class="srv-icon">🗃</span>
+              <div class="srv-info"><div class="srv-name">SRV-DB-POSTGRES</div><div class="srv-sub">192.168.1.30 · PG 16</div></div>
+              <div class="srv-bars">
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#22d3ee">CPU</span><div class="mini-bar"><div class="mini-bar-fill" style="width:75%;background:#ef4444"></div></div></div>
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#f0b429">RAM</span><div class="mini-bar"><div class="mini-bar-fill" style="width:80%;background:#ef4444"></div></div></div>
+              </div>
+              <span class="dot dot-warn"></span>
+            </div>
+            <div class="srv-row">
+              <span class="srv-icon">📡</span>
+              <div class="srv-info"><div class="srv-name">SRV-STREAMING</div><div class="srv-sub">192.168.1.40 · RTSP/HLS</div></div>
+              <div class="srv-bars">
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#22d3ee">CPU</span><div class="mini-bar"><div class="mini-bar-fill" style="width:40%;background:#22d3ee"></div></div></div>
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#f0b429">RAM</span><div class="mini-bar"><div class="mini-bar-fill" style="width:55%;background:#f0b429"></div></div></div>
+              </div>
+              <span class="dot dot-on"></span>
+            </div>
+            <div class="srv-row">
+              <span class="srv-icon">🔒</span>
+              <div class="srv-info"><div class="srv-name">SRV-VPN-GATEWAY</div><div class="srv-sub">192.168.1.50 · OpenVPN</div></div>
+              <div class="srv-bars">
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#22d3ee">CPU</span><div class="mini-bar"><div class="mini-bar-fill" style="width:8%;background:#22c55e"></div></div></div>
+                <div class="mini-bar-wrap"><span class="mini-bar-label" style="color:#f0b429">RAM</span><div class="mini-bar"><div class="mini-bar-fill" style="width:22%;background:#22c55e"></div></div></div>
+              </div>
+              <span class="dot dot-on"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rede -->
+        <div class="panel" style="flex-shrink:0">
+          <div class="ph"><span class="ph-icon">🔗</span><span class="ph-title">Links de Rede</span></div>
+          <div class="pb">
+            <div class="net-panel">
+              <div class="net-row"><span class="net-name">Fibra Principal</span><div class="net-bar-wrap"><div class="net-bar-fill" style="width:28%;background:linear-gradient(90deg,#22d3ee,#6ee7b7)"></div></div><span class="net-val">280 Mbps</span></div>
+              <div class="net-row"><span class="net-name">Link Backup</span><div class="net-bar-wrap"><div class="net-bar-fill" style="width:5%;background:linear-gradient(90deg,#22c55e,#86efac)"></div></div><span class="net-val">50 Mbps</span></div>
+              <div class="net-row"><span class="net-name">VPN Prefeitura</span><div class="net-bar-wrap"><div class="net-bar-fill" style="width:12%;background:linear-gradient(90deg,#a78bfa,#c4b5fd)"></div></div><span class="net-val">120 Mbps</span></div>
+              <div class="net-row"><span class="net-name">LAN Interna</span><div class="net-bar-wrap"><div class="net-bar-fill" style="width:44%;background:linear-gradient(90deg,#f0b429,#fcd34d)"></div></div><span class="net-val">440 Mbps</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== S4: ACESSO RÁPIDO ===== -->
+    <div class="section" id="s4">
+      <div class="panel qr-sidebar col-flex">
+        <div class="ph"><span class="ph-icon">⭐</span><span class="ph-title">Recentes</span></div>
+        <div class="pb">
+          <div class="recent-list">
+            <div class="recent-item"><span class="recent-icon">📊</span><div class="recent-info"><div class="rname">Multivis</div><div class="rmeta">painel · há 2h</div></div></div>
+            <div class="recent-item"><span class="recent-icon">🗂</span><div class="recent-info"><div class="rname">Cautela</div><div class="rmeta">sistema · há 4h</div></div></div>
+            <div class="recent-item"><span class="recent-icon">🌧</span><div class="recent-info"><div class="rname">Alertario</div><div class="rmeta">monit. chuva · ontem</div></div></div>
+            <div class="recent-item"><span class="recent-icon">🚔</span><div class="recent-info"><div class="rname">Ocorrências COR</div><div class="rmeta">sistema · ontem</div></div></div>
+            <div class="recent-item"><span class="recent-icon">🗺</span><div class="recent-info"><div class="rname">Mapa GEO-Rio</div><div class="rmeta">geomapa · há 2d</div></div></div>
+            <div class="recent-item"><span class="recent-icon">📅</span><div class="recent-info"><div class="rname">Agenda – Crise</div><div class="rmeta">agenda · há 2d</div></div></div>
+          </div>
+        </div>
+        <div class="ph" style="border-top:1px solid var(--border);border-bottom:none;padding-top:12px"><span class="ph-icon">🔍</span><span class="ph-title">Buscar</span></div>
+        <div style="padding:8px 14px 14px">
+          <input class="inp" type="text" placeholder="Nome do sistema...">
+        </div>
+      </div>
+
+      <div class="panel" style="flex:1;overflow:hidden">
+        <div class="ph"><span class="ph-icon">⚡</span><span class="ph-title">Acesso Rápido</span><span class="ph-badge">24 sistemas</span></div>
+        <div class="pb qr-section">
+          <div class="qr-cat-title">🌧 Monitoramento Ambiental</div>
+          <div class="qr-grid" style="margin-bottom:14px">
+            <div class="qr-card"><span class="qr-icon">🌧</span><span class="qr-name">Alertario</span><span class="qr-type">Chuva</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🌡</span><span class="qr-name">INMET Rio</span><span class="qr-type">Temperatura</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🌊</span><span class="qr-name">Nível do Mar</span><span class="qr-type">Maré</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">💨</span><span class="qr-name">Radar Meteorológico</span><span class="qr-type">Vento</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+          </div>
+
+          <div class="qr-cat-title">🚨 Segurança & Emergência</div>
+          <div class="qr-grid" style="margin-bottom:14px">
+            <div class="qr-card"><span class="qr-icon">🚔</span><span class="qr-name">Ocorrências COR</span><span class="qr-type">Ocorrências</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🚒</span><span class="qr-name">Bombeiros Rio</span><span class="qr-type">Emergência</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🏥</span><span class="qr-name">SAMU Rio</span><span class="qr-type">Saúde</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">⛑</span><span class="qr-name">Defesa Civil</span><span class="qr-type">Risco</span><div class="qr-status"><span class="dot dot-warn"></span><span style="color:var(--warn);font-size:10.5px;font-weight:700">Lento</span></div></div>
+          </div>
+
+          <div class="qr-cat-title">🗺 Georreferenciamento</div>
+          <div class="qr-grid" style="margin-bottom:14px">
+            <div class="qr-card"><span class="qr-icon">🗺</span><span class="qr-name">GEO-Rio</span><span class="qr-type">Mapa</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">📍</span><span class="qr-name">Câmeras COR</span><span class="qr-type">CCTV</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🚌</span><span class="qr-name">GPS Ônibus</span><span class="qr-type">Transporte</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🚇</span><span class="qr-name">Metrô Rio</span><span class="qr-type">Metrô</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+          </div>
+
+          <div class="qr-cat-title">🏛 Gestão Municipal</div>
+          <div class="qr-grid" style="margin-bottom:14px">
+            <div class="qr-card"><span class="qr-icon">📊</span><span class="qr-name">Multivis</span><span class="qr-type">Painel</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">📅</span><span class="qr-name">Agenda Crise</span><span class="qr-type">Agenda</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🗂</span><span class="qr-name">Cautela</span><span class="qr-type">Controle</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">📰</span><span class="qr-name">Clipping</span><span class="qr-type">Imprensa</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🔔</span><span class="qr-name">Alertas Cidadão</span><span class="qr-type">Notificação</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">📷</span><span class="qr-name">Patrimônio Fotos</span><span class="qr-type">Arquivo</span><div class="qr-status"><span class="dot dot-off"></span><span style="color:#f87171;font-size:10.5px;font-weight:700">Offline</span></div></div>
+            <div class="qr-card"><span class="qr-icon">🖨</span><span class="qr-name">Impressora COR</span><span class="qr-type">Impressão</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+            <div class="qr-card"><span class="qr-icon">📺</span><span class="qr-name">TV Imprensa</span><span class="qr-type">Display</span><div class="qr-status"><span class="dot dot-on"></span><span style="color:var(--status-on);font-size:10.5px;font-weight:700">Online</span></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== S5: ESTÁGIO / CALOR ===== -->
+    <div class="section" id="s5">
+      <div class="panel stage-wrap" style="flex:1;padding:0">
+        <div class="ph"><span class="ph-icon">🚨</span><span class="ph-title">Selecionar Nível de Estágio</span></div>
+        <div class="pb" style="display:flex;flex-direction:column;gap:14px">
+
+          <!-- Banner ativo -->
+          <div class="alert-banner lvl1" id="stage-banner">
+            <span class="ab-icon" id="stage-banner-icon">🟢</span>
+            <div class="ab-info">
+              <div class="ab-title" id="stage-banner-title">Cidade em Estágio 1</div>
+              <div class="ab-sub" id="stage-banner-sub">Monitoramento de rotina. Equipes em operação normal.</div>
+            </div>
+          </div>
+
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px">Estágio de Crise</div>
+          <div class="stages-row">
+            <div class="stage-btn sel" onclick="setStage(1,this)">
+              <div class="stage-num">1</div>
+              <div class="stage-color" style="background:#22c55e"></div>
+              <div class="stage-desc">Estágio 1</div>
+            </div>
+            <div class="stage-btn" onclick="setStage(2,this)">
+              <div class="stage-num">2</div>
+              <div class="stage-color" style="background:#84cc16"></div>
+              <div class="stage-desc">Estágio 2</div>
+            </div>
+            <div class="stage-btn" onclick="setStage(3,this)">
+              <div class="stage-num">3</div>
+              <div class="stage-color" style="background:#f59e0b"></div>
+              <div class="stage-desc">Estágio 3</div>
+            </div>
+            <div class="stage-btn" onclick="setStage(4,this)">
+              <div class="stage-num">4</div>
+              <div class="stage-color" style="background:#f97316"></div>
+              <div class="stage-desc">Estágio 4</div>
+            </div>
+            <div class="stage-btn" onclick="setStage(5,this)">
+              <div class="stage-num">5</div>
+              <div class="stage-color" style="background:#ef4444"></div>
+              <div class="stage-desc">Estágio 5</div>
+            </div>
+          </div>
+
+          <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-top:6px">Alerta de Calor / Clima</div>
+          <div class="heat-row">
+            <div class="heat-btn sel" onclick="setHeat(1,this)">
+              <div class="heat-icon">☀️</div>
+              <div class="heat-label">Calor 1</div>
+              <div class="heat-sub">Atenção</div>
+            </div>
+            <div class="heat-btn" onclick="setHeat(2,this)">
+              <div class="heat-icon">🌡</div>
+              <div class="heat-label">Calor 2</div>
+              <div class="heat-sub">Moderado</div>
+            </div>
+            <div class="heat-btn" onclick="setHeat(3,this)">
+              <div class="heat-icon">🔥</div>
+              <div class="heat-label">Calor 3</div>
+              <div class="heat-sub">Intenso</div>
+            </div>
+            <div class="heat-btn" onclick="setHeat(4,this)">
+              <div class="heat-icon">🔥</div>
+              <div class="heat-label">Calor 4</div>
+              <div class="heat-sub">Crítico</div>
+            </div>
+            <div class="heat-btn" onclick="setHeat(5,this)">
+              <div class="heat-icon">🌋</div>
+              <div class="heat-label">Calor 5</div>
+              <div class="heat-sub">Extremo</div>
+            </div>
+          </div>
+
+          <div style="display:flex;gap:10px;margin-top:6px">
+            <button class="btn btn-primary" style="flex:1" onclick="applyAlert()">✅ Aplicar Configuração</button>
+            <button class="btn btn-ghost" style="flex:1" onclick="resetAlert()">↩ Resetar para Padrão</button>
+          </div>
+
+          <div class="link-box">
+            <span class="link-box-title">🖥 Link da Tela Pública (Telão)</span>
+            <span class="link-url" id="tela-url">—</span>
+            <button class="btn-copy" id="btn-copy-link" onclick="copyTelaLink()">📋 Copiar Link do Telão</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Timeline -->
+      <div class="panel s5-side" style="overflow:hidden">
+        <div class="ph"><span class="ph-icon">🕒</span><span class="ph-title">Histórico de Alertas</span></div>
+        <div class="pb" style="overflow-y:auto">
+          <div class="timeline">
+            <div class="tl-item"><span class="tl-dot green"></span><div class="tl-body"><div class="tl-time">12/03/2026 · 08:00</div><div class="tl-text">Estágio 1 ativado — Normal</div></div></div>
+            <div class="tl-item"><span class="tl-dot yellow"></span><div class="tl-body"><div class="tl-time">10/03/2026 · 14:30</div><div class="tl-text">Calor 1 declarado — temperaturas acima de 38°C</div></div></div>
+            <div class="tl-item"><span class="tl-dot green"></span><div class="tl-body"><div class="tl-time">08/03/2026 · 09:15</div><div class="tl-text">Estágio 2 encerrado — situação normalizada</div></div></div>
+            <div class="tl-item"><span class="tl-dot yellow"></span><div class="tl-body"><div class="tl-time">07/03/2026 · 18:40</div><div class="tl-text">Estágio 2 ativado — chuvas fortes na zona norte</div></div></div>
+            <div class="tl-item"><span class="tl-dot gray"></span><div class="tl-body"><div class="tl-time">05/03/2026 · 11:00</div><div class="tl-text">Alerta chuva encerrado</div></div></div>
+            <div class="tl-item"><span class="tl-dot yellow"></span><div class="tl-body"><div class="tl-time">04/03/2026 · 22:15</div><div class="tl-text">Alerta chuva emitido — acumulado 80mm</div></div></div>
+            <div class="tl-item"><span class="tl-dot gray"></span><div class="tl-body"><div class="tl-time">01/03/2026 · 08:00</div><div class="tl-text">Início do mês — Estágio 1 base</div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- .content -->
+</div><!-- .wrapper -->
+
+<script>
+/* ===== BROADCAST CHANNEL + LOCALSTORAGE ===== */
+const BC = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('cor_rio_alert') : null;
+const LS_KEY = 'cor_rio_state';
+
+function saveState(stage, heat){
+  const state = { stage, heat, ts: new Date().toLocaleString('pt-BR') };
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){}
+  if(BC) BC.postMessage(state);
+}
+
+/* ===== CLOCK ===== */
+function updateClock(){
+  const now = new Date();
+  const t = now.toLocaleTimeString('pt-BR',{hour12:false});
+  const d = now.toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'});
+  const ct = document.getElementById('clk-time');
+  const cd = document.getElementById('clk-date');
+  if(ct) ct.textContent = t;
+  if(cd) cd.textContent = d;
+}
+setInterval(updateClock,1000); updateClock();
+
+/* ===== NAV ===== */
+function switchSection(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.sec===id);
+  });
+  document.getElementById(id).classList.add('active');
+}
+
+/* ===== FILTER BTNS (S1) ===== */
+document.querySelectorAll('.fbtn').forEach(b=>{
+  b.addEventListener('click',function(){
+    if(this.textContent!=='Revalidar Todos'){
+      document.querySelectorAll('.fbtn:not(:first-child)').forEach(x=>x.classList.remove('on'));
+      this.classList.add('on');
+    }
+  });
+});
+
+/* ===== STAGE ===== */
+const stageMeta = {
+  1:{ cls:'lvl1', icon:'🟢', title:'Cidade em Estágio 1', sub:'Monitoramento de rotina. Equipes em operação normal.',    hdBg:'#217021' },
+  2:{ cls:'lvl1', icon:'🟡', title:'Cidade em Estágio 2', sub:'Monitoramento reforçado. Equipes em pré-alerta.',         hdBg:'#3d5c10' },
+  3:{ cls:'lvl2', icon:'🟠', title:'Cidade em Estágio 3', sub:'Risco moderado. Mobilização de equipes de campo.',        hdBg:'#6b4010' },
+  4:{ cls:'lvl3', icon:'🔴', title:'Cidade em Estágio 4', sub:'Acionamento de planos de contingência municipal.',        hdBg:'#6b1010' },
+  5:{ cls:'lvl4', icon:'🚨', title:'Cidade em ESTÁGIO 5', sub:'MÁXIMO ALERTA. Todas as equipes mobilizadas.',            hdBg:'#4d0000' },
+};
+let curStage=1, curHeat=1;
+
+function setStage(n,el){
+  document.querySelectorAll('.stage-btn').forEach(b=>b.classList.remove('sel','red'));
+  el.classList.add('sel');
+  if(n>=4) el.classList.add('red');
+  curStage=n;
+}
+
+const heatMeta = {
+  1:{ label:'CALOR 1', bg:'#1258b8' },
+  2:{ label:'CALOR 2', bg:'#7a4010' },
+  3:{ label:'CALOR 3', bg:'#8c2a10' },
+  4:{ label:'CALOR 4', bg:'#8c1010' },
+  5:{ label:'CALOR 5', bg:'#6b0000' },
+};
+
+function setHeat(n,el){
+  document.querySelectorAll('.heat-btn').forEach(b=>b.classList.remove('sel','hot'));
+  el.classList.add('sel');
+  if(n>=2) el.classList.add('hot');
+  curHeat=n;
+}
+
+function applyAlert(){
+  const sm = stageMeta[curStage];
+  const hm = heatMeta[curHeat];
+  const banner = document.getElementById('stage-banner');
+  banner.className = 'alert-banner '+sm.cls;
+  document.getElementById('stage-banner-icon').textContent = sm.icon;
+  document.getElementById('stage-banner-title').textContent = sm.title;
+  document.getElementById('stage-banner-sub').textContent = sm.sub;
+  document.getElementById('hdr-estagio-num').textContent = curStage;
+  document.getElementById('hdr-estagio-txt').textContent = curStage;
+  document.getElementById('hdr-calor-txt').textContent = hm.label;
+  const hdrE = document.querySelector('.h-estagio');
+  hdrE.style.background = `linear-gradient(135deg, ${sm.hdBg}, ${sm.hdBg}99)`;
+  const hdrC = document.querySelector('.h-calor');
+  hdrC.style.background = `linear-gradient(135deg, ${hm.bg}, ${hm.bg}99)`;
+  banner.style.outline = '2px solid rgba(255,255,255,0.4)';
+  setTimeout(()=>{ banner.style.outline=''; },600);
+  // Save & broadcast
+  saveState(curStage, curHeat);
+}
+
+function resetAlert(){
+  setStage(1, document.querySelectorAll('.stage-btn')[0]);
+  setHeat(1, document.querySelectorAll('.heat-btn')[0]);
+  applyAlert();
+}
+
+/* ===== LINK DO TELÃO ===== */
+function buildTelaUrl(){
+  const base = location.href.substring(0, location.href.lastIndexOf('/') + 1);
+  return base + 'cor_rio_telao.html';
+}
+function copyTelaLink(){
+  const url = buildTelaUrl();
+  navigator.clipboard.writeText(url).then(()=>{
+    const btn = document.getElementById('btn-copy-link');
+    btn.classList.add('copied');
+    btn.textContent = '✅ Link Copiado!';
+    setTimeout(()=>{ btn.classList.remove('copied'); btn.textContent='📋 Copiar Link do Telão'; },2500);
+  }).catch(()=>{
+    prompt('Copie o link abaixo:', url);
+  });
+}
+// Show URL in box
+window.addEventListener('DOMContentLoaded',()=>{
+  const el = document.getElementById('tela-url');
+  if(el) el.textContent = buildTelaUrl();
+  // Restore saved state if exists
+  const saved = loadState();
+  if(saved){
+    curStage = saved.stage;
+    curHeat  = saved.heat;
+    // Select correct buttons silently
+    document.querySelectorAll('.stage-btn').forEach((b,i)=>{ if(i===curStage-1) b.classList.add('sel'); else b.classList.remove('sel'); });
+    document.querySelectorAll('.heat-btn').forEach((b,i)=>{ if(i===curHeat-1) b.classList.add('sel'); else b.classList.remove('sel'); });
+    applyAlert();
+  }
+});
+
+/* ===== LIVE CPU/RAM simulation ===== */
+function animGauge(id,valId,pct,color){
+  const circle = document.getElementById(id);
+  const label  = document.getElementById(valId);
+  if(!circle) return;
+  const r = 32, c = 2*Math.PI*r;
+  const offset = c*(1-pct/100);
+  circle.style.strokeDashoffset = offset;
+  if(label) label.textContent = Math.round(pct)+'%';
+}
+setTimeout(()=>{
+  animGauge('g-cpu','gv-cpu',51,'#22d3ee');
+  animGauge('g-ram','gv-ram',65,'#f0b429');
+  animGauge('g-disk','gv-disk',35,'#22c55e');
+},300);
+
+// Subtle live updates every 4s
+setInterval(()=>{
+  const cpu = 44+Math.random()*18;
+  const ram = 60+Math.random()*12;
+  animGauge('g-cpu','gv-cpu',cpu,'#22d3ee');
+  animGauge('g-ram','gv-ram',ram,'#f0b429');
+  const log = document.getElementById('log-box');
+  if(log){
+    const msgs = [
+      'Heartbeat — todos os serviços OK','Sync de câmeras realizado','Verificação de sessões AnyDesk',
+      'Cache do banco de dados atualizado','Monitoramento de rede: normal','Backup incremental concluído',
+    ];
+    const lvls = ['ok','ok','ok','warn'];
+    const lvl  = lvls[Math.floor(Math.random()*lvls.length)];
+    const t    = new Date().toLocaleTimeString('pt-BR',{hour12:false});
+    const msg  = msgs[Math.floor(Math.random()*msgs.length)];
+    const lbl  = lvl==='ok'?'[OK]':'[WARN]';
+    const cls  = lvl==='ok'?'log-lvl-ok':'log-lvl-warn';
+    const div  = document.createElement('div');
+    div.className='log-line';
+    div.innerHTML=`<span class="log-time">${t}</span><span class="${cls}">${lbl}</span><span class="log-msg">${msg}</span>`;
+    log.insertBefore(div,log.firstChild);
+    if(log.children.length>30) log.removeChild(log.lastChild);
+  }
+},4000);
+</script>
+</body>
+</html>
