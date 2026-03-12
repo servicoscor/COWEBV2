@@ -658,10 +658,11 @@ nav.sidebar {
 ============================ */
 @media (max-width: 768px) {
 
-  html, body { overflow: hidden; }
+  html { height: 100%; overflow: hidden; }
+  body { height: 100%; overflow: hidden; }
 
   /* ── HEADER ── */
-  header { height: 52px; }
+  header { height: 52px; flex-shrink: 0; }
 
   .h-estagio { min-width: unset; padding: 0 10px; gap: 7px; }
   .badge-circle { width: 34px; height: 34px; }
@@ -683,61 +684,123 @@ nav.sidebar {
   .clock-time { font-size: 14px; letter-spacing: 1px; }
   .clock-date { display: none; }
 
-  /* ── LAYOUT ── */
-  .wrapper { flex-direction: column; height: calc(100vh - 52px); overflow: hidden; }
+  /* ── LAYOUT: wrapper ocupa o espaço restante ── */
+  .wrapper {
+    flex-direction: column;
+    height: calc(100vh - 52px);
+    overflow: hidden;
+  }
 
   /* ── SIDEBAR → BOTTOM TAB BAR ── */
   nav.sidebar {
-    width: 100%; height: 58px;
-    flex-direction: row; order: 2;
-    padding: 0; border-right: none; border-top: 1px solid var(--border);
-    overflow-x: auto; overflow-y: hidden;
-    gap: 0; flex-shrink: 0;
+    width: 100%;
+    height: 58px;
+    min-height: 58px;
+    flex-direction: row;
+    order: 2;
+    padding: 0;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 0;
+    flex-shrink: 0;
     scrollbar-width: none;
   }
   nav.sidebar::-webkit-scrollbar { display: none; }
   .nav-section-title, .nav-divider { display: none; }
 
   .nav-btn {
-    flex-direction: column; align-items: center; justify-content: center;
-    gap: 3px; padding: 6px 14px; border-radius: 0;
-    border: none; border-top: 2px solid transparent;
-    min-width: 70px; flex-shrink: 0; font-size: 9px;
-    white-space: nowrap; height: 100%;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 6px 14px;
+    border-radius: 0;
+    border: none;
+    border-top: 2px solid transparent;
+    min-width: 70px;
+    flex-shrink: 0;
+    font-size: 9px;
+    white-space: nowrap;
+    height: 100%;
   }
   .nav-btn::before { display: none; }
-  .nav-btn.active { border-top-color: var(--azul-light); background: rgba(20,60,140,0.45); box-shadow: none; }
+  .nav-btn.active {
+    border-top-color: var(--azul-light);
+    background: rgba(20,60,140,0.45);
+    box-shadow: none;
+  }
   .nav-btn .icon { font-size: 20px; }
 
-  /* ── CONTENT ── */
-  .content { flex: 1; order: 1; overflow: hidden; min-height: 0; }
+  /* ── CONTENT: ocupa tudo exceto a tabbar ── */
+  .content {
+    flex: 1;
+    order: 1;
+    overflow: hidden;
+    min-height: 0;
+    height: calc(100% - 58px);
+  }
 
-  /* ── SECTIONS ── */
-  .section { padding: 10px; overflow-y: auto !important; overflow-x: hidden; height: 100%; }
-  .section.active { flex-direction: column !important; gap: 10px; }
+  /* ── SECTIONS: scroll vertical dentro do content ── */
+  .section {
+    display: none;
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+  }
+  .section.active {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 10px;
+    height: 100%;
+  }
   .section::-webkit-scrollbar { width: 3px; }
   .section::-webkit-scrollbar-thumb { background: rgba(80,140,255,0.2); }
 
+  /* Todos os painéis dentro da section: altura automática, sem overflow cortando */
+  .section.active .panel {
+    overflow: visible;
+    flex-shrink: 0;
+  }
+  .section.active .pb {
+    overflow: visible;
+    height: auto;
+    max-height: none;
+  }
+
   /* ── S1: SISTEMAS ── */
-  .s1-reg, .s1-list, .s1-top { width: 100% !important; flex-shrink: unset; }
-  .s1-reg .pb, .s1-list .pb, .s1-top .pb { overflow: visible; }
+  .s1-reg, .s1-list, .s1-top {
+    width: 100% !important;
+    flex-shrink: 0;
+    height: auto !important;
+  }
 
   /* ── S2: ANYDESK ── */
-  .ad-sidebar { width: 100% !important; flex-shrink: unset; }
-  .ad-sidebar .pb, .ad-main { overflow: visible; }
+  .ad-sidebar { width: 100% !important; flex-shrink: 0; height: auto !important; }
   .anydesk-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  /* Panel do anydesk precisa de overflow visible pra mostrar tudo */
+  #s2 .panel { overflow: visible; height: auto !important; }
 
   /* ── S3: INFRAESTRUTURA ── */
-  .infra-main, .infra-side { width: 100% !important; flex-shrink: unset; overflow: visible; }
+  .infra-main, .infra-side {
+    width: 100% !important;
+    flex-shrink: 0;
+    height: auto !important;
+    overflow: visible;
+  }
   .gauge-row { grid-template-columns: repeat(3, 1fr) !important; }
   .gauge-ring, .gauge-ring svg { width: 64px; height: 64px; }
   .gauge-val .pct { font-size: 16px; }
-  .server-list { overflow: visible; }
-  .log-box { height: 180px; }
+  .server-list { overflow: visible; height: auto; max-height: none; }
+  .log-box { height: 200px; overflow-y: auto; }
 
   /* ── S4: ACESSO RÁPIDO ── */
-  .qr-sidebar { width: 100% !important; flex-shrink: unset; }
-  .qr-sidebar .pb, .qr-section { overflow: visible; }
+  .qr-sidebar { width: 100% !important; flex-shrink: 0; height: auto !important; }
+  .qr-section { overflow: visible; height: auto; }
   .qr-grid { grid-template-columns: repeat(3, 1fr) !important; }
   .qr-card { padding: 12px 8px; gap: 6px; }
   .qr-icon { font-size: 24px; }
@@ -745,7 +808,12 @@ nav.sidebar {
   .qr-type { font-size: 8px; }
 
   /* ── S5: ESTÁGIO / CALOR ── */
-  .stage-wrap, .s5-side { width: 100% !important; flex-shrink: unset; overflow: visible; }
+  .stage-wrap, .s5-side {
+    width: 100% !important;
+    flex-shrink: 0;
+    height: auto !important;
+    overflow: visible;
+  }
   .stages-row { grid-template-columns: repeat(5,1fr) !important; gap: 5px; }
   .stage-btn { padding: 10px 4px; }
   .stage-num { font-size: 26px; }
@@ -765,9 +833,12 @@ nav.sidebar {
   .ph { padding: 10px 12px 8px; }
   .ph-title { font-size: 15px; }
   .pb { padding: 10px 12px; }
-  .inp { padding: 10px 12px; font-size: 14px; }
+  .inp { padding: 10px 12px; font-size: 16px; } /* 16px evita zoom no iOS */
   .btn { padding: 11px 14px; font-size: 14px; }
   .btn-xs { padding: 7px 14px; font-size: 12px; }
+
+  /* col-flex panels internos */
+  .col-flex { overflow: visible; height: auto; }
 }
 
 /* ── Small phones (≤390px) ── */
