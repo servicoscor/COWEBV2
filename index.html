@@ -65,7 +65,7 @@ body::before {
 header {
   display: flex;
   align-items: stretch;
-  height: 62px;
+  height: 72px;
   position: relative;
   z-index: 200;
   box-shadow: 0 4px 30px rgba(0,0,0,0.6);
@@ -134,6 +134,16 @@ header {
 .h-calor:hover { filter:brightness(1.2); }
 .calor-label { font-size:9px; font-weight:600; color:rgba(255,255,255,0.6); text-transform:uppercase; letter-spacing:1.5px; }
 .calor-value { font-family:'Barlow Condensed',sans-serif; font-size:28px; font-weight:900; color:#fff; letter-spacing:2px; line-height:1; }
+.h-estagio.image-only,
+.h-calor.image-only {
+  background-repeat:no-repeat;
+  background-position:center;
+  background-size:cover;
+}
+.h-estagio.image-only > *,
+.h-calor.image-only > * {
+  display:none !important;
+}
 
 /* datetime */
 .h-clock {
@@ -150,7 +160,7 @@ header {
 ============================ */
 .wrapper {
   display:flex;
-  height: calc(100vh - 62px);
+  height: calc(100vh - 72px);
   position:relative;
 }
 
@@ -586,10 +596,23 @@ nav.sidebar {
   border:2px solid transparent; transition:all .25s;
   background:rgba(255,255,255,0.03);
   font-family:'Barlow Condensed',sans-serif;
+  position:relative;
+  overflow:hidden;
 }
 .stage-btn:hover { transform:translateY(-3px); border-color:var(--border2); }
-.stage-btn.sel { border-color:rgba(80,200,80,0.5); background:rgba(30,100,30,0.4); box-shadow:0 0 20px rgba(30,150,30,0.25); }
-.stage-btn.sel.red { border-color:rgba(220,50,50,0.5); background:rgba(120,20,20,0.4); box-shadow:0 0 20px rgba(200,30,30,0.25); }
+.stage-btn.sel { border-color:rgba(80,200,80,0.5); background:rgba(30,100,30,0.24); box-shadow:0 0 20px rgba(30,150,30,0.25); }
+.stage-btn.sel.red { border-color:rgba(220,50,50,0.5); background:rgba(120,20,20,0.3); box-shadow:0 0 20px rgba(200,30,30,0.25); }
+.stage-thumb {
+  display:block;
+  width:100%; height:56px;
+  object-fit:cover;
+  object-position:center;
+  border-radius:6px;
+  margin-bottom:8px;
+  border:1px solid rgba(100,160,255,0.2);
+  opacity:.72;
+  pointer-events:none;
+}
 .stage-num { font-size:36px; font-weight:900; color:#fff; margin-bottom:4px; }
 .stage-color { width:100%; height:4px; border-radius:2px; margin-bottom:8px; }
 .stage-desc { font-size:11px; font-weight:600; color:var(--text-dim); letter-spacing:.3px; }
@@ -600,10 +623,23 @@ nav.sidebar {
   border:2px solid transparent; transition:all .25s;
   background:rgba(255,255,255,0.03);
   font-family:'Barlow Condensed',sans-serif;
+  position:relative;
+  overflow:hidden;
 }
 .heat-btn:hover { transform:translateY(-3px); border-color:var(--border2); }
-.heat-btn.sel { border-color:rgba(30,100,220,0.5); background:rgba(15,50,140,0.45); box-shadow:0 0 20px rgba(20,80,200,0.25); }
-.heat-btn.sel.hot { border-color:rgba(220,80,20,0.5); background:rgba(120,40,10,0.4); box-shadow:0 0 20px rgba(220,60,10,0.25); }
+.heat-btn.sel { border-color:rgba(30,100,220,0.5); background:rgba(15,50,140,0.3); box-shadow:0 0 20px rgba(20,80,200,0.25); }
+.heat-btn.sel.hot { border-color:rgba(220,80,20,0.5); background:rgba(120,40,10,0.28); box-shadow:0 0 20px rgba(220,60,10,0.25); }
+.heat-thumb {
+  display:block;
+  width:100%; height:50px;
+  object-fit:cover;
+  object-position:center;
+  border-radius:6px;
+  margin-bottom:8px;
+  border:1px solid rgba(100,160,255,0.2);
+  opacity:.72;
+  pointer-events:none;
+}
 .heat-icon { font-size:28px; margin-bottom:4px; }
 .heat-label { font-size:14px; font-weight:800; color:#fff; }
 .heat-sub   { font-size:10px; font-weight:600; color:var(--text-dim); margin-top:2px; }
@@ -819,10 +855,12 @@ nav.sidebar {
   }
   .stages-row { grid-template-columns: repeat(5,1fr) !important; gap: 5px; }
   .stage-btn { padding: 10px 4px; }
+  .stage-thumb { height: 34px; margin-bottom: 5px; }
   .stage-num { font-size: 26px; }
   .stage-desc { font-size: 9px; }
   .heat-row { grid-template-columns: repeat(5,1fr) !important; gap: 5px; }
   .heat-btn { padding: 10px 4px; }
+  .heat-thumb { height: 30px; margin-bottom: 5px; }
   .heat-icon { font-size: 20px; }
   .heat-label { font-size: 11px; }
   .heat-sub { font-size: 8px; }
@@ -861,7 +899,7 @@ nav.sidebar {
 
 <!-- ========== HEADER ========== -->
 <header>
-  <div class="h-estagio">
+  <div class="h-estagio image-only">
     <div class="badge-circle">
       <span class="bn" id="hdr-estagio-num">1</span>
       <span class="bs">Rio</span>
@@ -885,7 +923,7 @@ nav.sidebar {
     </div>
   </div>
 
-  <div class="h-calor" onclick="switchSection('s5')">
+  <div class="h-calor image-only" onclick="switchSection('s5')">
     <span class="calor-label">Alerta</span>
     <span class="calor-value" id="hdr-calor-txt">CALOR 1</span>
   </div>
@@ -1358,26 +1396,31 @@ nav.sidebar {
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px">Estágio de Crise</div>
           <div class="stages-row">
             <div class="stage-btn sel" onclick="setStage(1,this)">
+              <img class="stage-thumb" src="Nivel%20estagio/estagio1.jpg" alt="Imagem do Estagio 1" loading="lazy">
               <div class="stage-num">1</div>
               <div class="stage-color" style="background:#22c55e"></div>
               <div class="stage-desc">Estágio 1</div>
             </div>
             <div class="stage-btn" onclick="setStage(2,this)">
+              <img class="stage-thumb" src="Nivel%20estagio/estagio2.jpg" alt="Imagem do Estagio 2" loading="lazy">
               <div class="stage-num">2</div>
               <div class="stage-color" style="background:#84cc16"></div>
               <div class="stage-desc">Estágio 2</div>
             </div>
             <div class="stage-btn" onclick="setStage(3,this)">
+              <img class="stage-thumb" src="Nivel%20estagio/estagio3.jpg" alt="Imagem do Estagio 3" loading="lazy">
               <div class="stage-num">3</div>
               <div class="stage-color" style="background:#f59e0b"></div>
               <div class="stage-desc">Estágio 3</div>
             </div>
             <div class="stage-btn" onclick="setStage(4,this)">
+              <img class="stage-thumb" src="Nivel%20estagio/estagio4.jpg" alt="Imagem do Estagio 4" loading="lazy">
               <div class="stage-num">4</div>
               <div class="stage-color" style="background:#f97316"></div>
               <div class="stage-desc">Estágio 4</div>
             </div>
             <div class="stage-btn" onclick="setStage(5,this)">
+              <img class="stage-thumb" src="Nivel%20estagio/estagio5.jpg" alt="Imagem do Estagio 5" loading="lazy">
               <div class="stage-num">5</div>
               <div class="stage-color" style="background:#ef4444"></div>
               <div class="stage-desc">Estágio 5</div>
@@ -1387,26 +1430,31 @@ nav.sidebar {
           <div style="font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:2px;margin-top:6px">Alerta de Calor / Clima</div>
           <div class="heat-row">
             <div class="heat-btn sel" onclick="setHeat(1,this)">
+              <img class="heat-thumb" src="Nivel%20calor/calor1.jpg" alt="Imagem do Calor 1" loading="lazy">
               <div class="heat-icon">☀️</div>
               <div class="heat-label">Calor 1</div>
               <div class="heat-sub">Atenção</div>
             </div>
             <div class="heat-btn" onclick="setHeat(2,this)">
+              <img class="heat-thumb" src="Nivel%20calor/calor2.jpg" alt="Imagem do Calor 2" loading="lazy">
               <div class="heat-icon">🌡</div>
               <div class="heat-label">Calor 2</div>
               <div class="heat-sub">Moderado</div>
             </div>
             <div class="heat-btn" onclick="setHeat(3,this)">
+              <img class="heat-thumb" src="Nivel%20calor/calor3.jpg" alt="Imagem do Calor 3" loading="lazy">
               <div class="heat-icon">🔥</div>
               <div class="heat-label">Calor 3</div>
               <div class="heat-sub">Intenso</div>
             </div>
             <div class="heat-btn" onclick="setHeat(4,this)">
+              <img class="heat-thumb" src="Nivel%20calor/calor4.jpg" alt="Imagem do Calor 4" loading="lazy">
               <div class="heat-icon">🔥</div>
               <div class="heat-label">Calor 4</div>
               <div class="heat-sub">Crítico</div>
             </div>
             <div class="heat-btn" onclick="setHeat(5,this)">
+              <img class="heat-thumb" src="Nivel%20calor/calor5.jpg" alt="Imagem do Calor 5" loading="lazy">
               <div class="heat-icon">🌋</div>
               <div class="heat-label">Calor 5</div>
               <div class="heat-sub">Extremo</div>
@@ -1450,11 +1498,203 @@ nav.sidebar {
 /* ===== BROADCAST CHANNEL + LOCALSTORAGE ===== */
 const BC = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('cor_rio_alert') : null;
 const LS_KEY = 'cor_rio_state';
+const STAGE_MIN = 1;
+const STAGE_MAX = 5;
+const HEAT_MIN = 1;
+const HEAT_MAX = 5;
+
+function normalizeState(stage, heat){
+  const s = Number.parseInt(stage, 10);
+  const h = Number.parseInt(heat, 10);
+  if(!Number.isInteger(s) || !Number.isInteger(h)) return null;
+  return {
+    stage: Math.min(STAGE_MAX, Math.max(STAGE_MIN, s)),
+    heat: Math.min(HEAT_MAX, Math.max(HEAT_MIN, h))
+  };
+}
 
 function saveState(stage, heat){
   const state = { stage, heat, ts: new Date().toLocaleString('pt-BR') };
   try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch(e){}
   if(BC) BC.postMessage(state);
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return null;
+    const parsed = JSON.parse(raw);
+    return normalizeState(parsed.stage, parsed.heat);
+  }catch(e){
+    return null;
+  }
+}
+
+/* ===== API SYNC =====
+  Configure by one of:
+  1) window.COWEB_API = { stageUrl, heatUrl, pollMs, timeoutMs, headers }
+  2) query string: ?api_stage=...&api_heat=...&api_poll_ms=10000
+  3) localStorage keys: cor_api_stage_url / cor_api_heat_url / cor_api_poll_ms
+*/
+const API_STAGE_KEYS = new Set([
+  'stage','estagio','stage_level','estagio_level','nivel_estagio',
+  'nivelestagio','current_stage','currentestagio','id_estagio','idstage','level','nivel'
+]);
+const API_HEAT_KEYS = new Set([
+  'heat','calor','heat_level','calor_level','nivel_calor',
+  'nivelcalor','current_heat','currentcalor','id_calor','idheat','level','nivel'
+]);
+const DEFAULT_STAGE_API_URL = 'https://aplicativo.cocr.com.br/estagio_api_app';
+const DEFAULT_HEAT_API_URL = 'https://aplicativo.cocr.com.br/calor_api';
+
+let apiSyncTimer = null;
+let apiSyncInFlight = false;
+let apiSyncStarted = false;
+
+function safeGetLocalStorage(key){
+  try{ return localStorage.getItem(key); }catch(e){ return null; }
+}
+
+function readApiSyncConfig(){
+  const params = new URLSearchParams(location.search);
+  const g = (window.COWEB_API && typeof window.COWEB_API === 'object') ? window.COWEB_API : {};
+  const stageUrl = params.get('api_stage') || safeGetLocalStorage('cor_api_stage_url') || g.stageUrl || DEFAULT_STAGE_API_URL;
+  const heatUrl = params.get('api_heat') || safeGetLocalStorage('cor_api_heat_url') || g.heatUrl || DEFAULT_HEAT_API_URL;
+  const pollRaw = params.get('api_poll_ms') || safeGetLocalStorage('cor_api_poll_ms') || g.pollMs;
+  const timeoutRaw = params.get('api_timeout_ms') || safeGetLocalStorage('cor_api_timeout_ms') || g.timeoutMs;
+  const pollMs = Number.parseInt(pollRaw, 10);
+  const timeoutMs = Number.parseInt(timeoutRaw, 10);
+
+  return {
+    stageUrl: String(stageUrl || '').trim(),
+    heatUrl: String(heatUrl || '').trim(),
+    pollMs: Number.isInteger(pollMs) ? Math.max(0, pollMs) : 0,
+    timeoutMs: Number.isInteger(timeoutMs) ? Math.max(1500, timeoutMs) : 6000,
+    headers: (g.headers && typeof g.headers === 'object') ? g.headers : {}
+  };
+}
+
+function parseLevelValue(value){
+  if(typeof value === 'number' && Number.isFinite(value)) return Math.trunc(value);
+  if(typeof value !== 'string') return null;
+  const m = value.trim().match(/-?\d+/);
+  if(!m) return null;
+  const parsed = Number.parseInt(m[0], 10);
+  return Number.isInteger(parsed) ? parsed : null;
+}
+
+function extractLevelFromPayload(payload, keySet, seen = new WeakSet()){
+  // Support APIs that return plain "3" / 3.
+  if(typeof payload === 'string' || typeof payload === 'number'){
+    return parseLevelValue(payload);
+  }
+
+  if(!payload || typeof payload !== 'object') return null;
+  if(seen.has(payload)) return null;
+  seen.add(payload);
+
+  if(Array.isArray(payload)){
+    for(const item of payload){
+      const found = extractLevelFromPayload(item, keySet, seen);
+      if(found !== null) return found;
+    }
+    return null;
+  }
+
+  for(const [rawKey, value] of Object.entries(payload)){
+    const key = String(rawKey).toLowerCase();
+    if(keySet.has(key)){
+      const found = parseLevelValue(value);
+      if(found !== null) return found;
+    }
+    if(value && typeof value === 'object'){
+      const nested = extractLevelFromPayload(value, keySet, seen);
+      if(nested !== null) return nested;
+    }
+  }
+  return null;
+}
+
+async function fetchApiPayload(url, timeoutMs, headers){
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), timeoutMs);
+  try{
+    const res = await fetch(url, {
+      method: 'GET',
+      cache: 'no-store',
+      headers,
+      signal: controller.signal
+    });
+    if(!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    if(!text) return null;
+    try{ return JSON.parse(text); }catch(e){ return text.trim(); }
+  }finally{
+    clearTimeout(timer);
+  }
+}
+
+async function pollApiStateOnce(config){
+  if(apiSyncInFlight) return;
+
+  const cfg = config || readApiSyncConfig();
+  if(!cfg.stageUrl && !cfg.heatUrl) return;
+
+  apiSyncInFlight = true;
+  try{
+    const [stagePayload, heatPayload] = await Promise.all([
+      cfg.stageUrl ? fetchApiPayload(cfg.stageUrl, cfg.timeoutMs, cfg.headers) : Promise.resolve(null),
+      cfg.heatUrl ? fetchApiPayload(cfg.heatUrl, cfg.timeoutMs, cfg.headers) : Promise.resolve(null),
+    ]);
+
+    let apiStage = null;
+    let apiHeat = null;
+
+    if(stagePayload !== null){
+      apiStage = extractLevelFromPayload(stagePayload, API_STAGE_KEYS);
+      apiHeat = extractLevelFromPayload(stagePayload, API_HEAT_KEYS);
+    }
+    if(heatPayload !== null){
+      if(apiHeat === null) apiHeat = extractLevelFromPayload(heatPayload, API_HEAT_KEYS);
+      if(apiStage === null) apiStage = extractLevelFromPayload(heatPayload, API_STAGE_KEYS);
+    }
+
+    const normalized = normalizeState(
+      apiStage === null ? curStage : apiStage,
+      apiHeat === null ? curHeat : apiHeat
+    );
+    if(!normalized) return;
+    if(normalized.stage === curStage && normalized.heat === curHeat) return;
+
+    curStage = normalized.stage;
+    curHeat = normalized.heat;
+    syncButtons();
+    applyAlert();
+  }catch(err){
+    console.warn('[API Sync]', err && err.message ? err.message : err);
+  }finally{
+    apiSyncInFlight = false;
+  }
+}
+
+async function runApiSyncLoop(){
+  if(!apiSyncStarted) return;
+  const cfg = readApiSyncConfig();
+  if(!cfg.stageUrl && !cfg.heatUrl){
+    apiSyncTimer = setTimeout(runApiSyncLoop, 1000);
+    return;
+  }
+  await pollApiStateOnce(cfg);
+  apiSyncTimer = setTimeout(runApiSyncLoop, cfg.pollMs);
+}
+
+function startApiSync(){
+  if(apiSyncStarted) return;
+  apiSyncStarted = true;
+
+  const cfg = readApiSyncConfig();
+  if(!cfg.stageUrl && !cfg.heatUrl) return;
+  runApiSyncLoop();
 }
 
 /* ===== CLOCK ===== */
@@ -1475,7 +1715,8 @@ function switchSection(id){
   document.querySelectorAll('.nav-btn').forEach(b=>{
     b.classList.toggle('active', b.dataset.sec===id);
   });
-  document.getElementById(id).classList.add('active');
+  const section = document.getElementById(id);
+  if(section) section.classList.add('active');
 }
 
 /* ===== FILTER BTNS (S1) ===== */
@@ -1489,42 +1730,77 @@ document.querySelectorAll('.fbtn').forEach(b=>{
 });
 
 /* ===== STAGE ===== */
+function getStageImage(level){
+  return `Nivel%20estagio/estagio${level}.jpg`;
+}
+function getHeatImage(level){
+  return `Nivel%20calor/calor${level}.jpg`;
+}
+
 const stageMeta = {
-  1:{ cls:'lvl1', icon:'🟢', title:'Cidade em Estágio 1', sub:'Monitoramento de rotina. Equipes em operação normal.',    hdBg:'#217021' },
-  2:{ cls:'lvl1', icon:'🟡', title:'Cidade em Estágio 2', sub:'Monitoramento reforçado. Equipes em pré-alerta.',         hdBg:'#3d5c10' },
-  3:{ cls:'lvl2', icon:'🟠', title:'Cidade em Estágio 3', sub:'Risco moderado. Mobilização de equipes de campo.',        hdBg:'#6b4010' },
-  4:{ cls:'lvl3', icon:'🔴', title:'Cidade em Estágio 4', sub:'Acionamento de planos de contingência municipal.',        hdBg:'#6b1010' },
-  5:{ cls:'lvl4', icon:'🚨', title:'Cidade em ESTÁGIO 5', sub:'MÁXIMO ALERTA. Todas as equipes mobilizadas.',            hdBg:'#4d0000' },
+  1:{ cls:'lvl1', icon:'🟢', title:'Cidade em Estágio 1', sub:'Monitoramento de rotina. Equipes em operação normal.',    hdBg:'#217021', img:getStageImage(1) },
+  2:{ cls:'lvl1', icon:'🟡', title:'Cidade em Estágio 2', sub:'Monitoramento reforçado. Equipes em pré-alerta.',         hdBg:'#3d5c10', img:getStageImage(2) },
+  3:{ cls:'lvl2', icon:'🟠', title:'Cidade em Estágio 3', sub:'Risco moderado. Mobilização de equipes de campo.',        hdBg:'#6b4010', img:getStageImage(3) },
+  4:{ cls:'lvl3', icon:'🔴', title:'Cidade em Estágio 4', sub:'Acionamento de planos de contingência municipal.',        hdBg:'#6b1010', img:getStageImage(4) },
+  5:{ cls:'lvl4', icon:'🚨', title:'Cidade em ESTÁGIO 5', sub:'MÁXIMO ALERTA. Todas as equipes mobilizadas.',            hdBg:'#4d0000', img:getStageImage(5) },
 };
 let curStage=1, curHeat=1;
 
 function setStage(n,el){
-  document.querySelectorAll('.stage-btn').forEach(b=>b.classList.remove('sel','red'));
-  el.classList.add('sel');
-  if(n>=4) el.classList.add('red');
-  curStage=n;
+  const parsed = Number.parseInt(n, 10);
+  if(!Number.isInteger(parsed) || !stageMeta[parsed]) return;
+  curStage = parsed;
+  syncButtons();
 }
 
 const heatMeta = {
-  1:{ label:'CALOR 1', bg:'#1258b8' },
-  2:{ label:'CALOR 2', bg:'#7a4010' },
-  3:{ label:'CALOR 3', bg:'#8c2a10' },
-  4:{ label:'CALOR 4', bg:'#8c1010' },
-  5:{ label:'CALOR 5', bg:'#6b0000' },
+  1:{ label:'CALOR 1', bg:'#1258b8', img:getHeatImage(1) },
+  2:{ label:'CALOR 2', bg:'#7a4010', img:getHeatImage(2) },
+  3:{ label:'CALOR 3', bg:'#8c2a10', img:getHeatImage(3) },
+  4:{ label:'CALOR 4', bg:'#8c1010', img:getHeatImage(4) },
+  5:{ label:'CALOR 5', bg:'#6b0000', img:getHeatImage(5) },
 };
 
 function setHeat(n,el){
-  document.querySelectorAll('.heat-btn').forEach(b=>b.classList.remove('sel','hot'));
-  el.classList.add('sel');
-  if(n>=2) el.classList.add('hot');
-  curHeat=n;
+  const parsed = Number.parseInt(n, 10);
+  if(!Number.isInteger(parsed) || !heatMeta[parsed]) return;
+  curHeat = parsed;
+  syncButtons();
 }
 
-function applyAlert(){
+function syncButtons(){
+  document.querySelectorAll('.stage-btn').forEach((b, i)=>{
+    const selected = (i + 1) === curStage;
+    b.classList.toggle('sel', selected);
+    b.classList.toggle('red', selected && curStage >= 4);
+  });
+  document.querySelectorAll('.heat-btn').forEach((b, i)=>{
+    const selected = (i + 1) === curHeat;
+    b.classList.toggle('sel', selected);
+    b.classList.toggle('hot', selected && curHeat >= 2);
+  });
+}
+
+function applyIncomingState(state){
+  const incoming = normalizeState(state?.stage, state?.heat);
+  if(!incoming) return;
+  if(incoming.stage === curStage && incoming.heat === curHeat) return;
+  curStage = incoming.stage;
+  curHeat = incoming.heat;
+  syncButtons();
+  applyAlert({ persist:false });
+}
+
+function applyAlert(options = {}){
+  const persist = options.persist !== false;
   const sm = stageMeta[curStage];
   const hm = heatMeta[curHeat];
   const banner = document.getElementById('stage-banner');
+  if(!sm || !hm || !banner) return;
   banner.className = 'alert-banner '+sm.cls;
+  banner.style.backgroundImage = '';
+  banner.style.backgroundSize = '';
+  banner.style.backgroundPosition = '';
   document.getElementById('stage-banner-icon').textContent = sm.icon;
   document.getElementById('stage-banner-title').textContent = sm.title;
   document.getElementById('stage-banner-sub').textContent = sm.sub;
@@ -1532,22 +1808,22 @@ function applyAlert(){
   document.getElementById('hdr-estagio-txt').textContent = curStage;
   document.getElementById('hdr-calor-txt').textContent = hm.label;
   const hdrE = document.querySelector('.h-estagio');
-  hdrE.style.background = `linear-gradient(135deg, ${sm.hdBg}, ${sm.hdBg}99)`;
+  hdrE.style.background = `url('${sm.img}') center/100% 100% no-repeat`;
   const hdrC = document.querySelector('.h-calor');
-  hdrC.style.background = `linear-gradient(135deg, ${hm.bg}, ${hm.bg}99)`;
+  hdrC.style.background = `url('${hm.img}') center/cover no-repeat`;
   banner.style.outline = '2px solid rgba(255,255,255,0.4)';
   setTimeout(()=>{ banner.style.outline=''; },600);
-  // Save & broadcast
-  saveState(curStage, curHeat);
+  if(persist) saveState(curStage, curHeat);
 }
 
 function resetAlert(){
-  setStage(1, document.querySelectorAll('.stage-btn')[0]);
-  setHeat(1, document.querySelectorAll('.heat-btn')[0]);
+  curStage = 1;
+  curHeat = 1;
+  syncButtons();
   applyAlert();
 }
 
-/* ===== LINK DO TELÃO ===== */
+/* ===== LINK DO TELAO ===== */
 function buildTelaUrl(){
   const base = location.href.substring(0, location.href.lastIndexOf('/') + 1);
   return base + 'cor_rio_telao.html';
@@ -1557,8 +1833,8 @@ function copyTelaLink(){
   navigator.clipboard.writeText(url).then(()=>{
     const btn = document.getElementById('btn-copy-link');
     btn.classList.add('copied');
-    btn.textContent = '✅ Link Copiado!';
-    setTimeout(()=>{ btn.classList.remove('copied'); btn.textContent='📋 Copiar Link do Telão'; },2500);
+    btn.textContent = 'Link Copiado!';
+    setTimeout(()=>{ btn.classList.remove('copied'); btn.textContent='Copiar Link do Telao'; },2500);
   }).catch(()=>{
     prompt('Copie o link abaixo:', url);
   });
@@ -1567,16 +1843,42 @@ function copyTelaLink(){
 window.addEventListener('DOMContentLoaded',()=>{
   const el = document.getElementById('tela-url');
   if(el) el.textContent = buildTelaUrl();
+  const hdrCalor = document.querySelector('.h-calor');
+  if(hdrCalor){
+    hdrCalor.setAttribute('role', 'button');
+    hdrCalor.setAttribute('tabindex', '0');
+    hdrCalor.setAttribute('aria-label', 'Abrir painel de alertas');
+    hdrCalor.addEventListener('keydown', (event)=>{
+      if(event.key === 'Enter' || event.key === ' '){
+        event.preventDefault();
+        switchSection('s5');
+      }
+    });
+  }
   // Restore saved state if exists
   const saved = loadState();
   if(saved){
     curStage = saved.stage;
     curHeat  = saved.heat;
-    // Select correct buttons silently
-    document.querySelectorAll('.stage-btn').forEach((b,i)=>{ if(i===curStage-1) b.classList.add('sel'); else b.classList.remove('sel'); });
-    document.querySelectorAll('.heat-btn').forEach((b,i)=>{ if(i===curHeat-1) b.classList.add('sel'); else b.classList.remove('sel'); });
-    applyAlert();
+    syncButtons();
+    applyAlert({ persist:false });
+  }else{
+    syncButtons();
+    applyAlert({ persist:false });
   }
+  startApiSync();
+});
+
+if(BC){
+  BC.addEventListener('message', (event)=>{
+    applyIncomingState(event.data);
+  });
+}
+window.addEventListener('storage', (event)=>{
+  if(event.key !== LS_KEY || !event.newValue) return;
+  try{
+    applyIncomingState(JSON.parse(event.newValue));
+  }catch(e){}
 });
 
 /* ===== LIVE CPU/RAM simulation ===== */
@@ -1615,7 +1917,16 @@ setInterval(()=>{
     const cls  = lvl==='ok'?'log-lvl-ok':'log-lvl-warn';
     const div  = document.createElement('div');
     div.className='log-line';
-    div.innerHTML=`<span class="log-time">${t}</span><span class="${cls}">${lbl}</span><span class="log-msg">${msg}</span>`;
+    const timeEl = document.createElement('span');
+    timeEl.className = 'log-time';
+    timeEl.textContent = t;
+    const lvlEl = document.createElement('span');
+    lvlEl.className = cls;
+    lvlEl.textContent = lbl;
+    const msgEl = document.createElement('span');
+    msgEl.className = 'log-msg';
+    msgEl.textContent = msg;
+    div.append(timeEl, lvlEl, msgEl);
     log.insertBefore(div,log.firstChild);
     if(log.children.length>30) log.removeChild(log.lastChild);
   }
