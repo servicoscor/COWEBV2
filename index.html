@@ -211,6 +211,7 @@ nav.sidebar {
 }
 .nav-btn.active::before { transform:scaleY(1); }
 .nav-btn .icon { font-size:16px; flex-shrink:0; }
+.nav-label-short { display: none; }
 
 .nav-divider { height:1px; background:var(--border); margin:6px 0; }
 
@@ -732,6 +733,8 @@ nav.sidebar {
     box-shadow: none;
   }
   .nav-btn .icon { font-size: 20px; }
+  .nav-label { display: none; }
+  .nav-label-short { display: inline; font-size: 9px; color: inherit; }
 
   /* ── CONTENT: ocupa tudo exceto a tabbar ── */
   .content {
@@ -901,23 +904,23 @@ nav.sidebar {
   <nav class="sidebar">
     <span class="nav-section-title">Operações</span>
     <button class="nav-btn active" onclick="switchSection('s1')" data-sec="s1">
-      <span class="icon">🖥</span> Gerenciar Sistemas
+      <span class="icon">🖥</span><span class="nav-label">Gerenciar Sistemas</span><span class="nav-label-short">Sistemas</span>
     </button>
     <button class="nav-btn" onclick="switchSection('s2')" data-sec="s2">
-      <span class="icon">📡</span> Conexões AnyDesk
+      <span class="icon">📡</span><span class="nav-label">Conexões AnyDesk</span><span class="nav-label-short">AnyDesk</span>
     </button>
     <div class="nav-divider"></div>
     <span class="nav-section-title">Infraestrutura</span>
     <button class="nav-btn" onclick="switchSection('s3')" data-sec="s3">
-      <span class="icon">⚙️</span> Infraestrutura Remota
+      <span class="icon">⚙️</span><span class="nav-label">Infraestrutura Remota</span><span class="nav-label-short">Infra</span>
     </button>
     <button class="nav-btn" onclick="switchSection('s4')" data-sec="s4">
-      <span class="icon">⚡</span> Painel de Acesso Rápido
+      <span class="icon">⚡</span><span class="nav-label">Painel de Acesso Rápido</span><span class="nav-label-short">Acesso</span>
     </button>
     <div class="nav-divider"></div>
     <span class="nav-section-title">Alertas</span>
     <button class="nav-btn" onclick="switchSection('s5')" data-sec="s5">
-      <span class="icon">🚨</span> Selecionar Estágio / Calor
+      <span class="icon">🚨</span><span class="nav-label">Selecionar Estágio / Calor</span><span class="nav-label-short">Estágio</span>
     </button>
   </nav>
 
