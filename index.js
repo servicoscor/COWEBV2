@@ -653,6 +653,67 @@ function clearSystemForm(){
   if(urlEl) urlEl.value = '';
 }
 
+function downloadTextFile(filename, content){
+  const blob = new Blob([content], { type:'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  document.body.appendChild(anchor);
+  anchor.click();
+  anchor.remove();
+  URL.revokeObjectURL(url);
+}
+
+function buildSystemsExportText(items, scope){
+  const now = new Date();
+  const header = [
+    'COWEBV2 - Exportacao de Sistemas',
+    `Escopo: ${scope}`,
+    `Gerado em: ${now.toLocaleString('pt-BR')}`,
+    `Total: ${items.length}`,
+    ''
+  ];
+
+  const rows = items.map((sys, idx)=>{
+    const checkedAt = sys.lastCheck ? new Date(sys.lastCheck).toLocaleString('pt-BR') : 'Nao verificado';
+    const status = sys.status === 'online' ? 'Online' : (sys.status === 'offline' ? 'Offline' : 'Verificando');
+    return [
+      `${idx + 1}. ${sys.name || '-'}`,
+      `URL: ${sys.url || '-'}`,
+      `Status: ${status}`,
+      `Ultima verificacao: ${checkedAt}`,
+      ''
+    ].join('\n');
+  });
+
+  return [...header, ...rows].join('\n');
+}
+
+function exportSystemsToTxt(mode){
+  const normalizedMode = mode === 'online' || mode === 'offline' ? mode : 'all';
+  let items = systems.slice();
+  let scopeLabel = 'Todos';
+
+  if(normalizedMode === 'online'){
+    items = items.filter(sys=>sys.status === 'online');
+    scopeLabel = 'Ativos (Online)';
+  }else if(normalizedMode === 'offline'){
+    items = items.filter(sys=>sys.status === 'offline');
+    scopeLabel = 'Inativos (Offline)';
+  }
+
+  if(!items.length){
+    alert('Nao ha itens para exportar neste filtro.');
+    return;
+  }
+
+  const stamp = new Date().toISOString().replace(/[:T]/g, '-').slice(0, 19);
+  const fileSuffix = normalizedMode === 'all' ? 'todos' : normalizedMode;
+  const content = buildSystemsExportText(items, scopeLabel);
+  downloadTextFile(`sistemas_${fileSuffix}_${stamp}.txt`, content);
+}
+
 function initSystemsMonitor(){
   systems = loadSystemsRegistry();
   editingSystemId = null;
@@ -668,6 +729,9 @@ function initSystemsMonitor(){
   const btnAll = document.getElementById('fbtn-all');
   const btnOnline = document.getElementById('fbtn-online');
   const btnOffline = document.getElementById('fbtn-offline');
+  const btnExportAllTxt = document.getElementById('btn-export-all-txt');
+  const btnExportOnlineTxt = document.getElementById('btn-export-online-txt');
+  const btnExportOfflineTxt = document.getElementById('btn-export-offline-txt');
   const search = document.getElementById('s1-search');
   const urlInput = document.getElementById('inp-sys-url');
   const list = document.getElementById('sys-list');
@@ -678,6 +742,9 @@ function initSystemsMonitor(){
   if(btnAll) btnAll.addEventListener('click', ()=>{ currentFilter='all'; setFilterButton('all'); renderSystemsRegistry(); });
   if(btnOnline) btnOnline.addEventListener('click', ()=>{ currentFilter='online'; setFilterButton('online'); renderSystemsRegistry(); });
   if(btnOffline) btnOffline.addEventListener('click', ()=>{ currentFilter='offline'; setFilterButton('offline'); renderSystemsRegistry(); });
+  if(btnExportAllTxt) btnExportAllTxt.addEventListener('click', ()=>exportSystemsToTxt('all'));
+  if(btnExportOnlineTxt) btnExportOnlineTxt.addEventListener('click', ()=>exportSystemsToTxt('online'));
+  if(btnExportOfflineTxt) btnExportOfflineTxt.addEventListener('click', ()=>exportSystemsToTxt('offline'));
 
   if(search){
     search.addEventListener('input', ()=>{
