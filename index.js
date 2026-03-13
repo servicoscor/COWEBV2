@@ -1902,6 +1902,20 @@ function applyAlert(options = {}){
   hdrE.style.background = `url('${sm.img}') center/100% 100% no-repeat`;
   const hdrC = document.querySelector('.h-calor');
   hdrC.style.background = `url('${hm.img}') center/cover no-repeat`;
+  const sideStageImg = document.getElementById('side-stage-img');
+  const sideHeatImg = document.getElementById('side-heat-img');
+  const sideStageTag = document.getElementById('side-stage-tag');
+  const sideHeatTag = document.getElementById('side-heat-tag');
+  if(sideStageImg){
+    sideStageImg.src = sm.img;
+    sideStageImg.alt = `Estagio ${curStage}`;
+  }
+  if(sideHeatImg){
+    sideHeatImg.src = hm.img;
+    sideHeatImg.alt = hm.label;
+  }
+  if(sideStageTag) sideStageTag.textContent = `Estagio ${curStage}`;
+  if(sideHeatTag) sideHeatTag.textContent = hm.label;
   banner.style.outline = '2px solid rgba(255,255,255,0.4)';
   setTimeout(()=>{ banner.style.outline=''; },600);
   if(persist) saveState(curStage, curHeat);
